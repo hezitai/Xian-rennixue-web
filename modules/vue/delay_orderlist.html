@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+            <el-button type="primary" @click="search">搜索</el-button>
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <el-table-column
+            label="ID"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.userId }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column 
+          label="姓名"
+          width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.callName }}</span>
+          </template>
+          </el-table-column>
+          <el-table-column 
+          label="微信号"
+          width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.wxAccount }}</span>
+          </template>
+          </el-table-column>
+          <el-table-column 
+          label="学校名称"
+          width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.schoolName }}</span>
+          </template>
+         </el-table-column>
+         <el-table-column 
+         label="专业名称"
+         width="100">
+         <template slot-scope="scope">
+          <span>{{ scope.row.professionalName }}</span>
+        </template>
+        </el-table-column>
+           <el-table-column 
+            label="需求备注"
+            width="130">
+            <template slot-scope="scope">
+              <span>{{ scope.row.explained }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="下单时间"
+            width="150">
+            <template slot-scope="scope">
+              <span>{{ scope.row.createAt }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="操作">  
+                <template slot-scope="scope">  
+                <el-button size="mini" @click="allocation(scope.row,scope.$index)">分配客服</el-button>   
+                <el-button size="mini" @click="apply(scope.row,scope.$index)">坏单申请</el-button>
+                </template>  
+            </el-table-column> 
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+            :visible.sync="allocations"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="分配客服" prop="country">
+                <el-form-item>
+                  <el-select placeholder="请选择分配客服" v-model="ruleForm.country" style="width: 200px;" @change="handleChange">
+                    <el-option
+                    v-for="item in selects"
+                    :key="item.userId"
+                    :label="item.username"
+                    :value="item.userId">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+          <!-- 添加的弹框 -->
+          <el-dialog
+          :visible.sync="allocations1"
+          width="40%">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+              <el-form-item label="坏单原因" prop="reason">
+              <el-form-item>
+                  <el-input v-model="ruleForm.reason"></el-input>                  
+              </el-form-item>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="submitForm1('ruleForm')">确 定</el-button>
+          </span>
+        </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      allocations:false,
+      allocations1:false,
+      currentPage: 0,
+      selects:'',
+      pageSize: 0,
+      total:0,
+      idss:[],
+      courseId:'',
+      id:'',
+      val:1,
+      data:'',
+      value:'',
+      ruleForm: {
+        },
+        rules: {
+          country: [
+            { required: true, message: '请选择更换客服', trigger: 'change' }
+          ],
+          reason: [
+            { required: true, message: '请输入坏单原因', trigger: 'blur' }
+          ]
+        }
+      }
+ },
+ multipleSelection: [],
+ mounted() {
+  this.getTableData(); 
+ if (this.totalItems > this.pageSize) {
+  for (let index = 0; index < this.pageSize; index++) {
+  this.tableDataEnd.push(this.tableDataBegin[index]);
+  }
+ } else {
+  this.tableDataEnd = this.tableDataBegin;
+ }
+ },
+ methods: {
+  search:function(){     
+      },
+  choosedata:function(value){
+    console.log(value);
+    this.value = value;
+  },    
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": 6 ,
+            "statused": 1
+          } ,
+          url : ""+baseURL+"sys/seller/order/queryDelayOrderList",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      },
+ openData() {this.getTableData();},
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+
+ handleCurrentChange(val) {
+   vm.val = val;
+  vm.getTableData();
+ },
+ handleChange(val) {
+  let obj = {};
+    obj = this.selects.find((item)=>{
+        return item.userId === val;
+    });
+    vm.userId = obj.userId;
+    vm.username = obj.username;
+},
+ allocation(row,index){
+  this.allocations = true;
+  vm.courseId = row.id;
+  vm.groupNo = row.groupNo;
+var token = localStorage.getItem("token");
+    $.ajax({  
+      type : "get",  
+      dataType: "json", 
+      data:{
+        "token": token,
+        "page": 1,
+        "limit": 1000 
+      } ,
+      url : ""+baseURL+"sys/user/getMyDeptUserList",  
+      success : function(json) {  
+        vm.selects = json.body.list;
+      },  
+      error : function(json) {  
+
+    }  
+  });
+ },
+ apply(row,index){
+  vm.id = row.id;
+  this.allocations1 = true;
+ },
+  handleSelectionChange(val) {
+    this.multipleSelection = val;
+    let ids = [];
+    this.multipleSelection.map((item)=> {
+      var id = item.id;
+    ids.push(""+id+"");
+    });
+    this.selectedIDs = ids;
+    console.log('多选',ids);
+    this.idss =  this.selectedIDs;
+    console.log(this.idss);
+  },
+  submitForm2(formName) {
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+    let _this = this;
+    console.log(this.$refs.ruleForm.model.title);
+    var datas = _this.ruleForm;
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+            var token = localStorage.getItem("token");
+          $.ajax({  
+            type : "post",  
+            dataType : "json", 
+            cache: false, 
+            headers: {"token": token},
+            data: {
+              "courseId" : vm.courseId,
+              "groupNo" : vm.groupNo,
+              "sellerId" : vm.userId,
+              "sellerName" : vm.username
+            },
+            url : ""+baseURL+"sys/seller/order/assigOrder",  
+            success : function(json) {  
+              if(json.status == "200"){
+                vm.$message({
+                message: '订单分配成功',
+                type: 'success'
+              });
+              vm.allocations=false;
+              vm.getTableData();
+              }
+           },  
+           error : function(json) {  
+   
+          }  
+        });
+            } else {
+              console.log('error submit!!');
+              return false;
+            }
+          });
+  },   
+  submitForm1(formName) {
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+    this.$refs[formName].validate((valid) => {
+      if (valid) {
+        $.ajax({  
+        type : "POST",  
+        dataType: "json", 
+        data:{
+          "token": token,
+          "id": vm.id,
+          "description": this.$refs.ruleForm.model.reason 
+        } ,
+        url : ""+baseURL+"sys/seller/order/applyBadOrder",  
+        success : function(json) {  
+          if(json.status == "200"){
+              vm.$message({
+              message: '订单分配成功',
+              type: 'success'
+            });
+            vm.allocations1=false;
+            vm.getTableData();
+            }
+            if(json.status == "400"){
+              vm.$message({
+              message: '订单分配失败',
+              type: 'warning'
+            });
+            vm.allocations1=false;
+            vm.getTableData();
+            }
+        }
+    });
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
+  },    
+  resetForm(formName) {
+    this.$refs[formName].resetFields();
+  },
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

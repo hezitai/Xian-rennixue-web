@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="订单号"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.orderNo }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+              label="师资专员"
+              width="80">
+              <template slot-scope="scope">
+                <span>{{ scope.row.callName }}</span>
+              </template>
+           </el-table-column>
+            <el-table-column 
+            label="订单分类"
+            width="100">
+            <template slot-scope="scope">
+                <span v-if='scope.row.sooTypeed===0'>运营抢单</span>
+                <span v-if='scope.row.sooTypeed===1'>委派订单</span>
+                <span v-if='scope.row.sooTypeed===2'>自主抢单</span>
+           </template>
+           </el-table-column>
+           <el-table-column 
+            label="订单类型"
+            width="100">
+            <template slot-scope="scope">
+                <span v-if='scope.row.spoType===0'>普通订单</span>
+                <span v-if='scope.row.spoType===1'>考试大礼包</span>
+                <span v-if='scope.row.spoType===2'>包课服务</span>
+                <span v-if='scope.row.spoType===4'>论文润色</span>
+                <span v-if='scope.row.spoType===8'>普通论文辅导</span>
+                <span v-if='scope.row.spoType===16'>大论文辅导</span>
+                <span v-if='scope.row.spoType===32'>特殊订单</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="讲师姓名"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.wxAccount }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="委派时间"
+            width="100">
+            <template slot-scope="scope">
+              <span>{{ scope.row.orderTime }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="订单状态"
+            width="100">
+            <template slot-scope="scope">
+              <span v-if='scope.row.statused===128'>待排课</span>
+              <span v-if='scope.row.statused===256'>已排课</span>
+              <span v-if='scope.row.statused===512'>申请节课中</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="可获G币"
+            width="80">
+            <template slot-scope="scope">
+                <span>{{ scope.row.teacFixedPrice }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="操作">  
+                <template slot-scope="scope">  
+                <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)">赠送G币</el-button> 
+                <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button>     
+                </template>  
+            </el-table-column> 
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+            :visible.sync="dialogFormVisible2"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+              <el-form-item label="赠送G币的个数" prop="glod">
+                  <el-input v-model="ruleForm.glod"></el-input>
+              </el-form-item>
+              <el-form-item label="赠送otG币的个数" prop="glod1">
+                  <el-input v-model="ruleForm.glod1"></el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+          <!-- 添加的弹框评价 -->
+          <el-dialog
+          :visible.sync="evaluate"
+          width="40%">
+            <div class="text item">
+                课堂网络质量: {{evaluates.networkRate}}分
+            </div>  
+            <div class="text item">
+                是否达到您的辅导需求: {{evaluates.expectRate}}分
+            </div>  
+            <div class="text item">
+                使用万能班长满意度: {{evaluates.platRate}}分
+            </div>            
+            <div class="text item">
+                专业水平: {{evaluates.professRate}}分
+            </div>  
+            <div class="text item">
+                上课态度: {{evaluates.attitudeRate}}分
+            </div>  
+            <div class="text item">
+                辅导技巧: {{evaluates.skillRate}}分
+            </div>  
+            <div class="text item">
+                意见及建议: {{evaluates.proposal}}分
+            </div>  
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="exit">确 定</el-button>
+            </span>
+        </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        evaluate:false,
+        evaluates:'',
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      dialogFormVisible:false,
+      dialogFormVisible2:false,
+      idss:[],
+      operaterOrderStatusedArr:"3;4",
+      spoTypeArr:null,
+      sooTypeedArr:null,
+      sooStatusedArr:null,
+      selects:'',
+      countryId:'',
+      glod:'',
+      glod1:'',
+      key:'',
+      id:'',
+      val:1,
+      page:"",
+      name:'',
+      ruleForm: {
+        },
+        rules: {
+          glod: [
+            { required: true, message: '请输入gb', trigger: 'blur' }
+          ],
+          glod1: [
+            { required: true, message: '请输入otgb', trigger: 'blur' }
+          ]
+        }
+      }
+ },
+
+ mounted() {
+  this.getTableData(); 
+  // this.getdata();
+ },
+ methods: {
+    // sure_end(row,index){
+    //   this.$confirm('是否要结课程?', '提示', {
+    //       confirmButtonText: '确定',
+    //       cancelButtonText: '取消',
+    //       type: 'warning'
+    //     })
+    //     .then(_ => {
+    //     var token = localStorage.getItem("token");
+    //     $.ajax({  
+    //       type : "post",  
+    //       dataType: "json", 
+    //       data:{
+    //         "token": token,
+    //         "courseId":row.id,
+    //       } ,
+    //       url : ""+baseURL+"/sys/oper/positiveFinishCourse",  
+    //       success : function(json) {  
+    //         if(json.status == "400"){
+    //           vm.$message({
+    //           message: json.body.msg,
+    //           type: 'warning'
+    //         });
+    //         vm.getTableData();
+    //         }
+    //         if(json.status == "200"){
+    //           vm.$message({
+    //           message: "确认结课成功",
+    //           type: 'success'
+    //         });
+    //         vm.getTableData();
+    //         }
+    //      } 
+    //   });
+    // })
+    // .catch(_ => {
+    //       });
+    // },
+  // getdata(){
+  //   var self = this;  
+  //   axios.get(""+baseURL+"/sys/oper/getOperatorOrder",{
+  //   params:{
+  //     "token": token,
+  //     "page": this.val,
+  //     "limit": 6 ,
+  //     "statused" : 1
+  //   }
+  //   })
+  //   .then(function(response){
+  //     self.tableDataEnd = response.data.body.list; 
+  //     self.total = response.data.body.totalCount;
+  //     self.pageSize = response.data.body.totalCount;
+  //     self.currentPage = response.data.body.currPage;
+  //   })
+  //   .catch(function(err){
+  //     console.log(err);
+  //   });
+  // },
+  seedetail(row,index){
+    window.open( "seller_detail1.html?id="+row.id+"");
+  }, 
+  exit(){
+  vm.evaluate = false;
+  },
+  see_evaluate(row,index){
+    vm.evaluate = true;
+    $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 10 
+    } ,
+    url : ""+baseURL+"sys/oper/getCourseEvaluation?courseId="+row.id+"",  
+    success : function(json) {  
+      if(json.body == null){
+        vm.evaluates = ""; 
+      }else{
+        vm.evaluates = json.body; 
+      }
+
+    }
+});
+  },
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": 6 ,
+            "operaterOrderStatusedArr": "3;4;6",
+            "spoTypeArr":this.spoTypeArr,
+            "sooTypeedArr":this.sooTypeedArr,
+            "sooStatusedArr":this.sooStatusedArr,
+          } ,
+          url : ""+baseURL+"/sys/oper/getMyOperatorOrder",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.pageSize;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }
+      });    
+      },
+
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+ },
+ handleCurrentChange(val) {
+
+ },
+dialogVisible(row,_index){
+  vm.id = row.id;
+  this.dialogFormVisible2=true;
+},
+
+  submitForm2(formName) {
+    var self = this;
+    this.$refs[formName].validate((valid) => {
+          if (valid) {
+            console.log(this.ruleForm.country)
+            var token = localStorage.getItem("token");
+            $.ajax({  
+              type : "post",  
+              dataType: "json", 
+              headers: {"token": token},
+              data:{
+                gb: this.ruleForm.glod,
+                otgb: this.ruleForm.glod1,
+                courseId:vm.id
+              },
+              url : ""+baseURL+"sys/oper/order/handselGbToTeacher",  
+              success : function(json) {  
+                if(json.status == 200){
+                  vm.$message({
+                  message: '赠送成功',
+                  type: 'success'
+                });
+                vm.dialogFormVisible2=false;
+                }
+                if(json.status == 400){
+                  vm.$message({
+                  message: '赠送失败',
+                  type: 'warning'
+                });
+                vm.dialogFormVisible2=false;
+                }
+              }
+          });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+
+      },      
+
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+        let ids = [];
+        this.multipleSelection.map((item)=> {
+          var id = item.id;
+        ids.push(""+id+"");
+        });
+        this.selectedIDs = ids;
+        console.log('多选',ids);
+        this.idss =  this.selectedIDs;
+        console.log(this.idss);
+      }, 
+   
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

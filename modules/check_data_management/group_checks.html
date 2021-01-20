@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div id="app">
+        <el-table 
+        :data="tableDataEnd"
+        ref="multipleTable"
+        border
+        style="width: 100%;margin-top:5px;"
+        :default-sort = "{prop: 'date', order: 'descending'}">
+          <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column>
+        <el-table-column
+        width="50"
+        label="id">
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column
+        label="图片">
+        <template slot-scope="scope">
+            <span><img :src="scope.row.fileUrl" style="margin-right:10px;border:1px solid #ddd;cursor:pointer"></span>
+        </template>
+        </el-table-column>
+        </el-table>
+    </div>
+    <p><span>组长</span><span style="margin-left:20px;">审核：</span><span id="s1" style="margin-left:20px;"></span></p>
+    <p><span></span><span style="margin-left:50px;">请选择不通过原因：</span><span id="s2" style="margin-left:20px;"></span></p>
+    <p><span></span><span style="margin-left:50px;">原因：</span><span id="s3" style="margin-left:20px;"></span></p>
+
+    <!-- <p><span>经理</span><span style="margin-left:20px;">审核：</span><span id="s4" style="margin-left:20px;"></span></p>
+    <p><span></span><span style="margin-left:50px;">请选择不通过原因：</span><span id="s5" style="margin-left:20px;"></span></p>
+    <p><span></span><span style="margin-left:50px;">原因：</span><span id="s6" style="margin-left:20px;"></span></p> -->
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript"> 
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        disabled:false,  
+      checkstatus:'',
+      resshow:false,  
+      reasons:'',  
+      btnstatus:false,  
+      btnval:'提 交',  
+      tableDataEnd:[],
+      imgurl:'',
+      dialogVisible:false,
+      ruleForm: {
+        groupCheckDesc:'',
+        region1:'',
+        reason:'',
+        groupCheckStatus:'',
+        groupExceptionTypeId:'',
+        description:'',
+        },
+      }
+ },
+
+ mounted() {
+  this.getcheckdata();
+ },
+ methods: {
+    getcheckdata(){
+      getUrlStr =  function(name) {
+  　　var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+  　　var r = window.location.search.substr(1).match(reg);
+  　　if(r != null) return unescape(r[2]);
+  　　return null;
+  };
+  var id = getUrlStr ("id");
+      $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "id": id,
+          } ,
+          url : ""+baseURL+"sys/checkList/getCheckInfo",  
+          success : function(json) {  
+           vm.tableDataEnd=json.body.upfileLists;  
+           vm.ruleForm.groupCheckStatus = ""+json.body.groupCheckStatus+"";  
+           vm.ruleForm.groupExceptionTypeId = json.body.groupExceptionTypeId; 
+           vm.ruleForm.description = json.body.description; 
+           var groupCheckDesc = json.body.groupCheckDesc; 
+           var groupExceptionTypeMsg = json.body.groupExceptionTypeMsg;  
+           if(json.body.groupCheckStatus == 1){
+            $("#s1").html("已通过");
+           }
+           if(json.body.groupCheckStatus == 2){
+            $("#s1").html("不通过");
+           }
+           $("#s2").html(groupExceptionTypeMsg);
+           $("#s3").html(groupCheckDesc);
+           var managerCheckDesc = json.body.managerCheckDesc; 
+           var managerExceptionTypeMsg = json.body.managerExceptionTypeMsg;  
+           if(json.body.managerCheckStatus == 1){
+            $("#s4").html("已通过");
+           }
+           if(json.body.managerCheckStatus == 2){
+            $("#s4").html("不通过");
+           }
+           $("#s5").html(managerExceptionTypeMsg);
+           $("#s6").html(managerCheckDesc);
+         }  
+      }); 
+    },   
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

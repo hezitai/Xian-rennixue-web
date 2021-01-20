@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+</head>
+
+<body>
+    <div id="img_div">
+        <input type="file" id="img_upload">
+        <img id="picture" alt="头像" class="img-rounded">
+    </div>
+    <button value="上传" id="up"></button>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script type="text/javascript">  
+$("#up").click(function(){
+  var file=$("#img_upload")[0].files[0];
+  if(file==null)
+      return;
+  var formData=new FormData();
+  formData.append('file',file);
+  formData.append('name',"1");
+  formData.append('cdId',"1");
+  formData.append('groupId',"1");
+  var token = localStorage.getItem("token");
+  $.ajax({
+    headers: {"token": token},
+      url:"http://192.168.191.1:8088/sys/seller/courseware/save",
+      type:'POST',
+      processData: false,
+      contentType: false,
+      data:formData,
+      mimeType: "multipart/form-data"
+
+  });
+})
+  </script>
+</body>  
+</html>  
+</html>

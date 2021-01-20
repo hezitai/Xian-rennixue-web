@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>西安任你学</title>
+    <link rel="Shortcut Icon" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <link rel="Bookmark" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="css/all-skins.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="modules/vue/css/index.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body class="hold-transition login-page">
+    <div class="login-box" id="rrapp" v-cloak>
+        <div class="login-logo">
+            <b>西安任你学<br>(管理平台)</b>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg">管理员登录</p>
+            <div v-if="error" class="alert alert-danger alert-dismissible">
+                <h4 style="margin-bottom: 0px;"><i class="fa fa-exclamation-triangle"></i> {{errorMsg}}</h4>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" v-model="username" placeholder="账号" @keyup.enter="login">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" v-model="password" placeholder="密码" @keyup.enter="login">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+
+            <div class="row">
+                <div style="text-align:center">
+                    <el-button type="primary" v-bind:loading="btnstatus" @click="login" id="login" style="width:320px;">{{btnval}}</el-button>
+                    <!-- <button type="button" class="btn btn-primary btn-block btn-flat" @click="login" @keyup.enter="login" id="login">登录</button> -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.social-auth-links -->
+
+        </div>
+        <!-- /.login-box-body -->
+    </div>
+    <!-- /.login-box -->
+    <script src="libs/jquery.min.js"></script>
+    <script src="plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="libs/vue.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="modules/vue/js/index.js"></script>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: '#rrapp',
+            data: {
+                btnstatus: false,
+                btnval: "登陆",
+                username: '',
+                password: '',
+                captcha: '',
+                error: false,
+                errorMsg: '',
+            },
+            beforeCreate: function () {
+                if (self != top) {
+                    top.location.href = self.location.href;
+                }
+            },
+            methods: {
+                login: function () {
+                    vm.btnstatus = true;
+                    vm.btnval = "加载中";
+                    var data = "username=" + vm.username + "&password=" + vm.password + "&captcha=" + vm.captcha;
+                    $.ajax({
+                        type: "POST",
+                        url: baseURL + "sys/login",
+                        data: data,
+                        dataType: "json",
+                        success: function (r) {
+                            if (r.status == 200) {
+                                localStorage.setItem("xian_token", r.body.token);
+                                setTimeout(function () {
+                                    parent.location.href = 'index.html';
+                                }, 1000);
+                            } else {
+                                vm.error = true;
+                                vm.errorMsg = r.body.msg;
+                                vm.btnstatus = false;
+                                vm.btnval = "登陆";
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).keydown(function (event) {
+            if (event.keyCode == 13) {
+                $("#login").click();
+            }
+        });
+    </script>
+</body>
+
+</html>

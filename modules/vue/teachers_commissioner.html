@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="订单号"
+            width="180">
+            <template slot-scope="scope">
+              <span>{{ scope.row.studCourse.orderNo }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+              label="姓名"
+              width="80">
+              <template slot-scope="scope">
+                <span>{{ scope.row.studCourse.callName }}</span>
+              </template>
+           </el-table-column>
+            <el-table-column 
+            label="学校名称"
+            width="190">
+            <template slot-scope="scope">
+             <span>{{ scope.row.studCourse.schoolName }}</span>
+           </template>
+           </el-table-column>
+           <el-table-column 
+            label="专业名称"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.studProfessionalName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="课程名称"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.studCourse.offCourseName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="下单时间"
+            width="160">
+            <template slot-scope="scope">
+              <span>{{ scope.row.createAt }}</span>
+            </template>
+
+            </el-table-column>
+            <el-table-column label="操作">  
+                <template slot-scope="scope">   
+                <el-button size="mini" @click="apply(scope.row,scope.$index)">抢单</el-button> 
+                </template>  
+            </el-table-column> 
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+            :visible.sync="dialogFormVisible2"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="分配教教师订单" prop="country">
+                <el-form-item>
+                  <el-select placeholder="请选择分配教教师" v-model="ruleForm.country" style="width: 200px;" @change="handleChange">
+                    <el-option
+                    v-for="item in selects"
+                    :key="item.id"
+                    :label="item.username"
+                    :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6,8,10]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 6,
+      total:0,
+      page:1,
+      filterTableDataEnd:[],
+      dialogFormVisible:false,
+      dialogFormVisible2:false,
+      idss:[],
+      options:[],
+      selectedOptions: [],
+      selects:'',
+      countryId:'',
+      country:'',
+      key:'',
+      id:'',
+      name:'',
+      superId:'',
+      label:'',
+      dialogStatus: "",
+      ruleForm: {
+
+        },
+        rules: {
+          country: [
+            { required: true, message: '请选择委派教师', trigger: 'change' }
+          ]
+        }
+      }
+ },
+
+ mounted() {
+  this.getTableData(); 
+ },
+ methods: {
+
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.page,
+            "limit": this.pageSize,
+            "isOperator":true
+          } ,
+          url : ""+baseURL+"sys/seller/order/list",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.pageSize;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      },
+
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.getTableData(); 
+ },
+ apply(row,index){
+  var self = this;
+    var token = localStorage.getItem("token");
+        self.$confirm('是否要接单?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              })
+              .then(_ => {
+                  $.ajax({  
+                    type : "POST",  
+                    dataType: "json", 
+                    data:{
+                      "token": localStorage.getItem("token"),
+                      "courseId": row.courseId,
+                    } ,
+                    url : ""+baseURL+"sys/oper/grabOrder",  
+                    success : function(json) {  
+                      if(json.status == "400"){
+                              vm.$message({
+                              message: "接单失败",
+                              type: 'warning'
+                            });
+                            }
+                      if(json.status == "200"){
+                        vm.$message({
+                        message: "接单成功",
+                        type: 'success'
+                      });
+                      vm.getTableData();
+                      }
+                    }
+                });
+              })  
+              .catch(_ => {
+          });
+ },
+handleChange(item) {
+},
+
+// dialogVisible(row,_index){
+//   vm.id = row.courseId;
+//   this.dialogFormVisible2=true;
+//   var token = localStorage.getItem("token");
+//   $.ajax({  
+//     type : "get",  
+//     dataType: "json", 
+//     data:{
+//       "token": token,
+//       "page": 1,
+//       "limit": 10 
+//     } ,
+//     url : ""+baseURL+"sys/oper/queryUserTeacList",  
+//     success : function(json) {  
+//       vm.selects = json.body.list; 
+//     }
+// });
+
+// },
+
+ handleCurrentChange(val) {
+  vm.page = val;
+  this.getTableData(); 
+ },
+
+  submitForm2(formName) {
+    var self = this;
+    this.$refs[formName].validate((valid) => {
+          if (valid) {
+            console.log(this.ruleForm.country)
+            var token = localStorage.getItem("token");
+            $.ajax({  
+              type : "post",  
+              dataType: "json", 
+              headers: {"token": token},
+              data:{
+                teacId: this.ruleForm.country,
+                courseId:vm.id
+              },
+              url : ""+baseURL+"sys/oper/assignedOrder",  
+              success : function(json) {  
+                if(json.status == 200){
+                  vm.$message({
+                  message: '分配订单成功',
+                  type: 'success'
+                });
+                vm.dialogFormVisible2=false;
+                }
+                if(json.status == 400){
+                  vm.$message({
+                  message: '分配订单失败',
+                  type: 'warning'
+                });
+                vm.dialogFormVisible2=false;
+                }
+              }
+          });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+
+      },      
+        toggleSelection(rows) {
+        if (rows) {
+          rows.forEach(row => {
+            this.$refs.multipleTable.toggleRowSelection(row);
+          });
+        } else {
+          this.$refs.multipleTable.clearSelection();
+        }
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+        let ids = [];
+        this.multipleSelection.map((item)=> {
+          var id = item.id;
+        ids.push(""+id+"");
+        });
+        this.selectedIDs = ids;
+        console.log('多选',ids);
+        this.idss =  this.selectedIDs;
+        console.log(this.idss);
+      }, 
+    
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

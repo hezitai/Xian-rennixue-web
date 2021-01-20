@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>首页</title>
+    <link rel="Shortcut Icon" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <link rel="Bookmark" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/v-charts/lib/style.min.css" />
+    <link rel="stylesheet" href="modules/check_data_management/css/index.css" />
+</head>
+<!-- <style>
+    .ul{
+    margin: 0 auto;
+    margin-bottom: 30px;
+}
+.ul:after{
+    display: block;clear: both;content: "";visibility: hidden;height: 0   
+}
+.ul li{
+    width: 30%;list-style: none;height: 100px;cursor: pointer;color: #fff;
+}
+.ul li a{
+    display: block;color: #fff;
+}
+.ul li i{
+    font-size: 46px;color: #fff;border-right: 1px solid #fff;width: 25%;display: inline-block;text-align: center;margin-top: 25px;float: left;
+}
+.ul li div{
+    margin-left: 20px;float: left;
+}
+.ul li div p{
+    margin: 0 !important;
+}
+.ul li:nth-child(1){
+    background: #409EFF;float: left;
+}
+.ul li:nth-child(2){
+    background: rgb(250, 192, 3);float: left;margin-left: 2.5%;
+}
+.ul li:nth-child(3){
+    background: #409EFF;float: right;margin-right: 5%;
+}
+.ul li div .p1{
+    font-size: 24px;
+    margin-top: 30px !important;
+}
+</style> -->
+<style>
+    .list2tableHead {
+        font-weight: 400 !important;
+        color: #606266;
+        white-space: normal;
+        word-break: break-all;
+    }
+
+    .kedu0::before {
+        content: '数据量';
+        display: block;
+        position: absolute;
+        width: 50px;
+        right: 10px;
+    }
+
+    .kedu0::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    .kedu1::after {
+        content: '200';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -28px;
+
+    }
+
+    .kedu2::after {
+        content: '400';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    .kedu3::after {
+        content: '600';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -28px;
+
+    }
+
+    .kedu4::after {
+        content: '800';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    .locationIcon {
+        position: absolute;
+        top: -30px;
+        width: 30px;
+        text-align: center;
+        height: 30px;
+    }
+
+    /* ****************************************************************** */
+    .kedu7::before {
+        content: '数据量';
+        display: block;
+        position: absolute;
+        width: 50px;
+        right: 10px;
+    }
+
+    .kedu7::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    .kedu8::after {
+        content: '800';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -28px;
+
+    }
+
+    .kedu9::after {
+        content: '850';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    .kedu10::after {
+        content: '900';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    .kedu11::after {
+        content: '950';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: 0px;
+
+    }
+
+    .kedu11a::after {
+        content: '1000';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    /* ****************************************************************** */
+    .kedu14::before {
+        content: '数据量';
+        display: block;
+        position: absolute;
+        width: 50px;
+        right: 10px;
+    }
+
+    .kedu14::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    .kedu15::after {
+        content: '1000';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -22px;
+
+    }
+
+    .kedu16::after {
+        content: '1050';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    .kedu17::after {
+        content: '1100';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: 0px;
+
+    }
+
+    .kedu18::after {
+        content: '1150';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: 0px;
+    }
+
+    .kedu18a::after {
+        content: '1200';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    /* ****************************************************************** */
+    .kedu21::before {
+        content: '数据量';
+        display: block;
+        position: absolute;
+        width: 50px;
+        right: 10px;
+    }
+
+    .kedu21::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    .kedu22::after {
+        content: '1200';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -24px;
+
+    }
+
+    .kedu23::after {
+        content: '1250';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    .kedu24::after {
+        content: '1300';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -23px;
+
+    }
+
+    .kedu25::after {
+        content: '1350';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    .kedu25a::after {
+        content: '1400';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    /* ****************************************************************** */
+    .kedu28::before {
+        content: '数据量';
+        display: block;
+        position: absolute;
+        width: 50px;
+        right: 10px;
+    }
+
+    .kedu28::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+    }
+
+    .kedu29::after {
+        content: '1400';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -24px;
+
+    }
+
+    .kedu30::after {
+        content: '1450';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    .kedu31::after {
+        content: '1500';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -23px;
+
+    }
+
+    .kedu32::after {
+        content: '1550';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -10px;
+
+    }
+
+    .kedu32a::after {
+        content: '1600';
+        display: block;
+        position: absolute;
+        width: 28px;
+        right: -14px;
+
+    }
+
+    /* *********************************************************************** */
+    .kedus0::after {
+        content: '0';
+        display: block;
+        position: absolute;
+        width: 30px;
+        right: -14px;
+        font-size: 12px;
+    }
+
+    .kedus1::after {
+        content: '350';
+        display: block;
+        position: absolute;
+        width: 30px;
+        right: -20px;
+        font-size: 12px;
+
+    }
+
+    .kedus2::after {
+        content: '700';
+        display: block;
+        position: absolute;
+        width: 30px;
+        right: -16px;
+        font-size: 12px;
+
+    }
+
+    .kedus3::after {
+        content: '1050';
+        display: block;
+        position: absolute;
+        width: 30px;
+        right: -20px;
+        font-size: 12px;
+
+    }
+
+    .kedus4::after {
+        content: '1400';
+        display: block;
+        position: absolute;
+        width: 30px;
+        right: -14px;
+        font-size: 12px;
+
+    }
+</style>
+
+<body>
+    <div class="panel panel-default">
+        <!-- <div class="panel-heading">基本信息</div> -->
+    </div>
+    <div id="app">
+        <!-- <ul class="ul" v-show="a">
+            <li id="li2"><a href="modules/data_management/userUnCheckList.html"><i class="el-icon-tickets"></i><div><p class="p1">我的数据</p></div></a></li>
+            <li id="li3"><a href="modules/data_management/userUnCheckList.html"><i class="el-icon-upload"></i><div><p class="p1">导入数据</p></div></a></li>
+        </ul>
+        <ul class="ul" v-show="b">
+            <li id="li4"><a href="modules/data_management/groupUnCheckList.html"><i class="el-icon-document"></i><div><p class="p1">待审核数据</p></div></a></li>
+            <li id="li5"><a href="modules/check_data_management/groupUnCheckList.html"><i class="el-icon-tickets"></i><div><p class="p1">待抽查数据</p></div></a></li>
+        </ul>
+        <ul class="ul" v-show="c">
+            <li id="li6"><a href="modules/data_management/managerUnCheckList.html"><i class="el-icon-document"></i><div><p class="p1">待审核数据</p></div></a></li>
+            <li id="li7"><a href="modules/check_data_management/managerUnCheckedList.html"><i class="el-icon-tickets"></i><div><p class="p1">待抽查数据</p></div></a></li>
+            <li id="li8"><a href="modules/data_management/main.html"><i class="el-icon-upload"></i><div><p class="p1">生成抽查数据</p></div></a></li>
+        </ul>-->
+        <div>
+            <div style="width:97%;margin-left: 2%;">
+                <h3 style="display:inline-block;">业绩排行</h3>
+                <a style="color:#409EFF;border:1px solid #409EFF;background:#fff;border-radius:5px;height: 30px;padding: 5px;text-decoration: none;"
+                    v-if="hasPermission('sys:index:createRandomData')"
+                    href="modules/data_management/main.html">生成抽查数据</a>
+                    <span style="color:red;font-size:12px">*业绩计算方式：总数 = 目标院校 + （非目标院校 / 2）</span>
+                <div style="float:right;margin-right: 20px;margin-top: 5px;">
+                    <el-select v-if="justManagerUp" v-model="list1teamlist" placeholder="请选择" @change="changeGroup">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option v-for="item in list1group" :key="item.id" :label="item.name" :value="item.deptId">
+                        </el-option>
+                    </el-select>
+                    <el-date-picker v-model="list1chooseMonth" :default-value='nowDate' type="daterange"
+                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                        value-format="yyyy-MM-dd HH:mm:ss" @change="getMonth" unlink-panels>
+                    </el-date-picker>
+                </div>
+
+                <div style="border:1px solid #EBEEF5;">
+                    <el-table :data="list1performanceRank" ref="multipleTable" stripe style="width: 100%">
+                        <el-table-column type="index" label="序号"> </el-table-column>
+                        <el-table-column label="姓名" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.userName }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="组别" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.deptName }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="业绩" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.counts }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="目标院校" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.aims }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="非目标院校" align='center'>
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.noAims }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="总有效数据" align='center'>
+                            <template slot-scope="scope">
+                                <span style='color:red;font-weight: 600;'>{{ scope.row.effectiveTotal }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="panset" align="center" width="500" label="图示">
+                            <template slot-scope="scope">
+                                <!-- <el-progress
+										:percentage="scope.row.percent"
+										color="scope.row.lineColor"
+										show-text
+                                    ></el-progress> -->
+                                <div class="drawLineBox" style="width:100%; height:50px; color:#666;">
+                                    <div style="width:100%;height: 100%; position: relative;">
+                                        <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                            <span v-bind:style='{width:scope.row.percent + "%"}'
+                                                style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                            <span
+                                                style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                            <span
+                                                style="display: block;width:1px;height:5px;background:#777;position:absolute;left: 0%;top: 0px;"></span>
+                                            <span
+                                                style="display: block;width:1px;height:5px;background:#777;position:absolute;left: 25%;top: 0px;"></span>
+                                            <span
+                                                style="display: block;width:1px;height:5px;background:#777;position:absolute;left: 50%;top: 0px;"></span>
+                                            <span
+                                                style="display: block;width:1px;height:5px;background:#777;position:absolute;right: 25%;top: 0px;"></span>
+                                            <span
+                                                style="display: block;width:1px;height:5px;background:#777;position:absolute;right: 0%;top: 0px;"></span>
+                                            <span class="kedus0"
+                                                style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                            <span class="kedus1"
+                                                style="display: block;position:absolute;left: 24%;float: left;text-align: center;"></span>
+                                            <span class="kedus2"
+                                                style="display: block;position:absolute;left: 50%;float: left;text-align: center;"></span>
+                                            <span class="kedus3"
+                                                style="display: block;position:absolute;right: 26%;float: left;text-align: center;"></span>
+                                            <span class="kedus4"
+                                                style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <!-- <el-pagination
+							style="margin-top:15px;margin-left:39%;"
+							@size-change="list1handleSizeChange"
+							@current-change="list1handleCurrentChange"
+							:current-page="list1currentPage"
+							:page-size="5"
+							layout="total, prev, pager, next, jumper"
+							:total="list1total"
+						>
+						</el-pagination> -->
+                </div>
+            </div>
+            <div v-if="changeBindSchoolButton">
+                <div style="width:97%;margin-left: 2%; margin-top: 30px;">
+                    <h3 style="display:inline-block;">销售简报</h3>
+                    <div style="float:right;margin-right: 20px;margin-top: 5px;">
+                        <el-select v-if="justManagerUp" v-model="list2teamlist" placeholder="请选择"
+                            @change="changeGroup2">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option v-for="item in list2group" :key="item.id" :label="item.name"
+                                :value="item.deptId">
+                            </el-option>
+                        </el-select>
+                        <el-date-picker v-model="list2chooseMonth" type="daterange" range-separator="至"
+                            start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="getMonth2" unlink-panels>
+                        </el-date-picker>
+                    </div>
+                    <div>
+                        <!-- <el-table :data="list2temp" border style="width: 100%;margin-bottom:30px;"
+                            header-row-class-name="list2tableHead">
+                            <el-table-column prop="data1" align="center" label="级别">
+                            </el-table-column>
+                            <el-table-column prop="data2" align="center" label="a">
+                            </el-table-column>
+                            <el-table-column prop="data3" align="center" label="b">
+                            </el-table-column>
+                            <el-table-column prop="data4" align="center" label="c">
+                            </el-table-column>
+                            <el-table-column prop="data5" align="center" label="d">
+                            </el-table-column>
+                            <el-table-column prop="data6" align="center" label="e">
+                            </el-table-column>
+                        </el-table> -->
+                        <el-table border :data="list2SalesKit" ref="multipleTable" stripe style="width: 100%">
+                            <el-table-column type="index" label="序号" width="50">
+                            </el-table-column>
+                            <el-table-column align="center" label="姓名">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.userName }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="有效数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.validNum }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="待编辑数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unEditCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="待确认数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unConfirmedCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="未通过数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unpassNum }}</span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <!-- <el-pagination
+								style="margin-top:15px;margin-left:39%;"
+								@size-change="list2handleSizeChange"
+								@current-change="list2handleCurrentChange"
+								:current-page="list2currentPage"
+								:page-size="5"
+								layout="total, prev, pager, next, jumper"
+								:total="list2total"
+							>
+							</el-pagination> -->
+                    </div>
+                </div>
+
+                <div style="width:97%;margin-left: 2%; margin-top: 30px;margin-bottom: 30px;">
+                    <h3 style="display:inline-block;">业绩汇总报表</h3>
+                    <div style="float:right;margin-right: 20px;margin-top: 5px;">
+                        <el-select v-model="list3chooseYear" placeholder="请选择" @change="changeYear">
+                            <el-option v-for="item in list3Year" :key="item.value" :label="item.name"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- list3Year -->
+                        <!-- <el-form-item label="数据类型：" label-width="100px">
+                                    <el-select v-model="teamlist" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in list3listType"
+                                            :key="item.value"
+                                            :label="item.name"
+                                            :value="item.value"
+                                        >
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="分组：" label-width="100px">
+                                    <el-select
+                                        v-if="justManagerUp"
+                                        v-model="list3teamlist"
+                                        placeholder="请选择"
+                                        @change="changeGroup3"
+                                    >
+                                        <el-option label="全部" value=""></el-option>
+                                        <el-option
+                                            v-for="item in list3group"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.deptId"
+                                        >
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item> -->
+                    </div>
+                    <div style="border:1px solid #EBEEF5;">
+                        <p style="border-bottom:1px solid #ccc; text-align:center;height:40px;ling-height:40px">
+                            有效数据量：{{ list3allCount }}
+                            <span style="font-size:14px;padding-left: 30px;position:relative;color:#666;"><img
+                                    style="position: absolute;top: 2px;left: -5px; margin:0 5px 0 15px;"
+                                    src="img/zhuyi.png" alt="" />有效数据量计算数据包括在职和离职员工的总有效数据量，
+                                人均数据量计算数据不包括离职员工</span>
+                        </p>
+                        <el-table :data="list3ResultsSummary" stripe style="width: 100%">
+                            <el-table-column align="center" label="时间">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.mouthNum }}月</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="人数">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.zPeopleNum }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="离职人数">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.lPeopleNum }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="有效数据量">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.mouthCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="月环比增长">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.yGrowthOf }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="人均数据量">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.jMouthCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="月环比增长">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.data.jGrowthOf }}</span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                    <div style="margin-top:20px;">
+                        <p style="color:#ccc;font-size:14px;text-align:center;">
+                            点击下面图表图标切换单一类别
+                        </p>
+                        <div id="container" style="width: 100%;height: 500px;"></div>
+                        <!-- <ve-line :data="chartData" :settings="chartSettings"></ve-line> -->
+                    </div>
+                </div>
+            </div>
+            <div v-if="changeBindSchoolButton == false">
+                <div style="width:97%;margin-left: 2%; margin-top: 30px;">
+                    <el-table :data="list4temp" border style="width: 100%;margin-bottom:30px;"
+                        header-row-class-name="list4tableHead">
+                        <el-table-column prop="data1" align="center" label="级别">
+                        </el-table-column>
+                        <el-table-column prop="data2" align="center" label="a">
+                        </el-table-column>
+                        <el-table-column prop="data3" align="center" label="b">
+                        </el-table-column>
+                        <el-table-column prop="data4" align="center" label="c">
+                        </el-table-column>
+                        <el-table-column prop="data5" align="center" label="d">
+                        </el-table-column>
+                        <el-table-column prop="data6" align="center" label="e">
+                        </el-table-column>
+                    </el-table>
+                    <!-- <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 0">振奋精神，迎接挑战，开创未来，再创佳绩</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 1">做事先做人，销售先销己，挣钱先夺心</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 2">销售要主动出击，不要守株待兔</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 3">坚持，小目标就在眼前</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 4">只有提升能力，才能倍增业绩，方可倍增收入，加油！</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 5">失败与挫折只是暂时，成功已不会太遥远</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 6">公司有我，无所不能，永争第一</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 7">今天付出，明天收获，全力以赴，事业辉煌</p>
+                    <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 8">为了获得超出他人的成绩，你必须要有超出一般的想法</p> -->
+                </div>
+                <div style="width:97%;margin-left: 2%; margin-top: 30px;">
+                    <h3 style="display:inline-block;">销售简报</h3>
+                    <div style="float:right;margin-right: 20px;margin-top: 5px;">
+                        <el-date-picker v-model="list4chooseMonth" type="daterange" range-separator="至"
+                            start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="getMonth4" unlink-panels>
+                        </el-date-picker>
+                    </div>
+
+                    <div style="border:1px solid #EBEEF5;">
+                        <!--  v-if="list4selfreport.length != 0" -->
+                        <div>
+                            <div class="drawLineBox" style="width:100%; height:180px; color:#666;"
+                                v-if='list4NumberLevel == 0'>
+                                <div style="width:100%;height: 100%; position: relative;">
+                                    <div style="height: 90px;">
+                                        <!-- <p style="text-align: center;">当前每条提成金额0.5元</p> -->
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 0">
+                                            振奋精神，迎接挑战，开创未来，再创佳绩</p>
+                                        <p style="color:#FFB76F;text-align:center;" v-else-if="list4showHearten == 1">
+                                            做事先做人，销售先销己，挣钱先夺心</p>
+                                        <p style="color:#FFB76F;text-align:center;" v-else-if="list4showHearten == 2">
+                                            销售要主动出击，不要守株待兔</p>
+                                        <p style="color:#FFB76F;text-align:center;" v-else-if="list4showHearten == 3">
+                                            坚持，小目标就在眼前</p>
+                                    </div>
+                                    <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                        <span class="kedu6"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -30px; right: -15px;"
+                                                src="img/location.png" alt="">
+                                        </span>
+                                        <div class="locationIcon" v-bind:style='{left:list4Number + "%"}'>
+                                            <!---v-bind:style='{left:list4Number + "%"}'--->
+                                            <span
+                                                style="display:block;width: 30px;position: absolute;right: 14px;background: #fff; height: 30px;">
+                                                <img style="position: absolute;top: -10px;right: 0px;" src="img/run.png"
+                                                    alt="" />
+                                                <span
+                                                    style="display:block;position:absolute;top:-42px;left:-90px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 0"><img src="img/Group 2@2x.png"
+                                                        style="width:120px;" alt=""></span>
+                                                <span
+                                                    style="display:block;position:absolute;top:-42px;left:-90px;padding: 0 5px;"
+                                                    v-else-if="list4showHearten == 1"><img src="img/Group@2x.png"
+                                                        style="width:120px;" alt=""></span>
+                                                <span
+                                                    style="display:block;position:absolute;top:-42px;left:-50px;padding: 0 5px;"
+                                                    v-else-if="list4showHearten == 2"><img src="img/Group 3@2x.png"
+                                                        style="width:80px;" alt=""></span>
+                                                <span
+                                                    style="display:block;position:absolute;top:-44px;left:-46px;padding: 0 5px;"
+                                                    v-else-if="list4showHearten == 3"><img src="img/Group 4@2x.png"
+                                                        style="width:80px;" alt=""></span>
+                                            </span>
+                                            <span
+                                                style="display:block;width: 80px;position: absolute;right: -10px;text-align: center;top: 55px; color:#FFB76F;">{{list4Count}}<br>当前位置</span>
+                                        </div>
+                                        <span v-bind:style='{width:list4Number + "%"}'
+                                            style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                        <span
+                                            style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 0%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 25%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 50%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 25%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 0%;top: 0px;"></span>
+                                        <span class="kedu0"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu1"
+                                            style="display: block;position:absolute;left: 24%;float: left;text-align: center;"></span>
+                                        <span class="kedu2"
+                                            style="display: block;position:absolute;left: 50%;float: left;text-align: center;"></span>
+                                        <span class="kedu3"
+                                            style="display: block;position:absolute;right: 26%;float: left;text-align: center;"></span>
+                                        <span class="kedu4"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu5"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -35px;right: -15px;"
+                                                src="img/lubiao.png" alt="">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="drawLineBox" style="width:100%; height:180px; color:#666;"
+                                v-else-if='list4NumberLevel == 1'>
+                                <div style="width:100%;height: 100%; position: relative;">
+                                    <div style="height: 90px;">
+                                        <!-- <p style="text-align: center;">当前每条提成金额1元</p> -->
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 4">
+                                            只有提升能力，才能倍增业绩，方可倍增收入，加油！</p>
+                                    </div>
+                                    <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                        <span class="kedu13"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -30px; right: -15px;"
+                                                src="img/location.png" alt="">
+                                        </span>
+                                        <div class="locationIcon" v-bind:style='{left:list4Number + "%"}'>
+                                            <span
+                                                style="display:block;width: 30px;position: absolute;right: 14px;background: #fff; height: 30px;">
+                                                <img style="position: absolute;top: -10px;right: 0px;" src="img/run.png"
+                                                    alt="" />
+                                                <span
+                                                    style="display:block;position:absolute;top:-46px;left:-57px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 4"><img src="img/Group 5@2x.png"
+                                                        style="width:90px;" alt=""></span>
+                                            </span>
+                                            <span
+                                                style="display:block;width: 80px;position: absolute;right: -10px;text-align: center;top: 55px; color:#FFB76F;">{{list4Count}}<br>当前位置</span>
+                                        </div>
+                                        <span v-bind:style='{width:list4Number + "%"}'
+                                            style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                        <span
+                                            style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 0%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 0%;top: 0px;"></span>
+                                        <span class="kedu7"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu8"
+                                            style="display: block;position:absolute;left: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu9"
+                                            style="display: block;position:absolute;left: 40%;float: left;text-align: center;"></span>
+                                        <span class="kedu10"
+                                            style="display: block;position:absolute;right: 40%;float: left;text-align: center;"></span>
+                                        <span class="kedu11"
+                                            style="display: block;position:absolute;right: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu11a"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu12"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -35px;right: -15px;"
+                                                src="img/lubiao.png" alt="">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="drawLineBox" style="width:100%; height:180px; color:#666;"
+                                v-else-if='list4NumberLevel == 2'>
+                                <div style="width:100%;height: 100%; position: relative;">
+                                    <div style="height: 90px;">
+                                        <!-- <p style="text-align: center;">当前每条提成金额2元</p> -->
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 5">
+                                            失败与挫折只是暂时，成功已不会太遥远</p>
+                                    </div>
+                                    <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                        <span class="kedu20"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -30px; right: -15px;"
+                                                src="img/location.png" alt="">
+                                        </span>
+                                        <div class="locationIcon" v-bind:style='{left:list4Number + "%"}'>
+                                            <span
+                                                style="display:block;width: 30px;position: absolute;right: 14px;background: #fff; height: 30px;">
+                                                <img style="position: absolute;top: -10px;right: 0px;" src="img/run.png"
+                                                    alt="" />
+                                                <span
+                                                    style="display:block;position:absolute;top:-47px;left:-57px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 5"><img src="img/Group 6@2x.png"
+                                                        style="width:90px;" alt=""></span>
+                                            </span>
+                                            <span
+                                                style="display:block;width: 80px;position: absolute;right: -10px;text-align: center;top: 55px; color:#FFB76F;">{{list4Count}}<br>当前位置</span>
+                                        </div>
+                                        <span v-bind:style='{width:list4Number + "%"}'
+                                            style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                        <span
+                                            style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 0%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 0%;top: 0px;"></span>
+                                        <span class="kedu14"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu15"
+                                            style="display: block;position:absolute;left: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu16"
+                                            style="display: block;position:absolute;left: 40%;float: left;text-align: center;"></span>
+                                        <span class="kedu17"
+                                            style="display: block;position:absolute;right: 39%;float: left;text-align: center;"></span>
+                                        <span class="kedu18"
+                                            style="display: block;position:absolute;right: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu18a"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu19"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -35px;right: -15px;"
+                                                src="img/lubiao.png" alt="">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="drawLineBox" style="width:100%; height:180px; color:#666;"
+                                v-else-if='list4NumberLevel == 3'>
+                                <div style="width:100%;height: 100%; position: relative;">
+                                    <div style="height: 90px;">
+                                        <!-- <p style="text-align: center;">当前每条提成金额2.5元</p> -->
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 6">
+                                            公司有我，无所不能，永争第一</p>
+                                    </div>
+                                    <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                        <span class="kedu27"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -30px; right: -15px;"
+                                                src="img/location.png" alt="">
+                                        </span>
+                                        <div class="locationIcon" v-bind:style='{left:list4Number + "%"}'>
+                                            <span
+                                                style="display:block;width: 30px;position: absolute;right: 14px;background: #fff; height: 30px;">
+                                                <img style="position: absolute;top: -10px;right: 0px;" src="img/run.png"
+                                                    alt="" />
+                                                <span
+                                                    style="display:block;position:absolute;top:-44px;left:-48px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 6"><img src="img/Group 7@2x.png"
+                                                        style="width:80px;" alt=""></span>
+                                            </span>
+                                            <span
+                                                style="display:block;width: 80px;position: absolute;right: -10px;text-align: center;top: 55px; color:#FFB76F;">{{list4Count}}<br>当前位置</span>
+                                        </div>
+                                        <span v-bind:style='{width:list4Number + "%"}'
+                                            style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                        <span
+                                            style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 0%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 0%;top: 0px;"></span>
+                                        <span class="kedu21"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu22"
+                                            style="display: block;position:absolute;left: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu23"
+                                            style="display: block;position:absolute;left: 40%;float: left;text-align: center;"></span>
+                                        <span class="kedu24"
+                                            style="display: block;position:absolute;right: 41%;float: left;text-align: center;"></span>
+                                        <span class="kedu25"
+                                            style="display: block;position:absolute;right: 20%;float: left;text-align: center;"></span>
+                                        <span class="kedu25a"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu26"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -35px;right: -15px;"
+                                                src="img/lubiao.png" alt="">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="drawLineBox" style="width:100%; height:180px; color:#666;"
+                                v-else-if='list4NumberLevel == 4'>
+                                <div style="width:100%;height: 100%; position: relative;">
+                                    <div style="height: 90px;">
+                                        <!-- <p style="text-align: center;">当前每条提成金额3元</p> -->
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 7">
+                                            今天付出，明天收获，全力以赴，事业辉煌</p>
+                                        <p style="color:#FFB76F;text-align:center;" v-if="list4showHearten == 8">
+                                            为了获得超出他人的成绩，你必须要有超出一般的想法</p>
+                                    </div>
+                                    <div style="margin:0 6%;margin-top:20px;position: relative;width: 88%;">
+                                        <span class="kedu34"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -30px; right: -15px;"
+                                                src="img/location.png" alt="">
+                                        </span>
+                                        <div class="locationIcon" v-bind:style='{left:list4Number + "%"}'>
+                                            <span
+                                                style="display:block;width: 30px;position: absolute;right: 14px;background: #fff; height: 30px;">
+                                                <img style="position: absolute;top: -10px;right: 0px;" src="img/run.png"
+                                                    alt="" />
+                                                <span
+                                                    style="display:block;position:absolute;top:-44px;left:-44px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 7"><img src="img/Group 8@2x.png"
+                                                        style="width:80px;" alt=""></span>
+                                                <span
+                                                    style="display:block;position:absolute;top:-44px;left: -70px;padding: 0 5px;"
+                                                    v-if="list4showHearten == 8"><img src="img/Group 9@2x.png"
+                                                        style="width:100px;" alt=""></span>
+                                            </span>
+                                            <span
+                                                style="display:block;width: 80px;position: absolute;right: -10px;text-align: center;top: 55px; color:#FFB76F;">{{list4Count}}<br>当前位置</span>
+                                        </div>
+                                        <span v-bind:style='{width:list4Number + "%"}'
+                                            style="height: 5px;background:#FFB76F;display: block;position: absolute;left: 0;border-radius:15px;"></span>
+                                        <span
+                                            style="width: 100%;height:5px;background:#ccc;display: block;border-radius:15px; "></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 0%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;left: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 40%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 20%;top: 0px;"></span>
+                                        <span
+                                            style="display: block;width:1px;height:5px;background:#2b2828;position:absolute;right: 0%;top: 0px;"></span>
+                                        <span class="kedu28"
+                                            style="display: block;position:absolute;left: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu29"
+                                            style="display: block;position:absolute;left: 19%;float: left;text-align: center;"></span>
+                                        <span class="kedu30"
+                                            style="display: block;position:absolute;left: 40%;float: left;text-align: center;"></span>
+                                        <span class="kedu31"
+                                            style="display: block;position:absolute;right: 41%;float: left;text-align: center;"></span>
+                                        <span class="kedu32"
+                                            style="display: block;position:absolute;right: 20%;float: left;text-align: center;"></span>
+                                        <span class="kedu32a"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;"></span>
+                                        <span class="kedu33"
+                                            style="display: block;position:absolute;right: 0%;float: left;text-align: center;">
+                                            <img style="width:30px;height:30px;position: absolute;top: -35px;right: -15px;"
+                                                src="img/lubiao.png" alt="">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <el-table :data="list4selfreport" :key='list4Count' ref="multipleTable" stripe
+                            style="width: 100%">
+                            <el-table-column type="index" label="序号"></el-table-column>
+                            <el-table-column label="姓名">
+                                <template align="center" slot-scope="scope">
+                                    <span>{{ scope.row.userName }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="有效数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.validNum }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="待编辑数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unEditCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="待确认数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unConfirmedCount }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column align="center" label="未通过数据">
+                                <template slot-scope="scope">
+                                    <span>{{ scope.row.unpassNum }}</span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div id="container" style="width: 100%;height: 500px;"></div> -->
+</body>
+<!-- <script src="modules/check_data_management/js/jquery.js"></script> -->
+<script src="libs/jquery.min.js"></script>
+<!-- <script src="libs/vue.min.js"></script> -->
+<!-- <script src="modules/check_data_management/js/vue.min.js"></script> -->
+<script src="modules/data_compile_list/js/vue-2.5.16.js"></script>
+<script src="//cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/v-charts/lib/index.min.js"></script>
+<script src="modules/check_data_management/js/index.js"></script>
+<script src="js/base.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js">
+</script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+<!-- <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script> -->
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+<!-- <script src="js/index.js"></script> -->
+<script src="js/common.js"></script>
+<script src="js/main.js"></script>
+
+<script type="text/javascript">
+    // var vm = new Vue({
+    //     el: '#app',
+    //     data() {
+    //         return {
+    //             a: false,
+    //             b: false,
+    //             c: false,
+    //             demoshow: false,
+    //             btnstatus: false,
+    //             btnval: "生成待抽查数据",
+    //             list1: '',
+    //             members: '',
+    //             deptId: '',
+    //             userId: '',
+    //             ruleForm: {
+    //                 startTime: '',
+    //                 endTime: '',
+    //                 deptId: '',
+    //                 infoNum: '',
+    //                 userId: '',
+    //             },
+    //             rules: {
+    //                 startTime: [{
+    //                     required: true,
+    //                     message: '请选择开始时间',
+    //                     trigger: 'change'
+    //                 }],
+    //                 endTime: [{
+    //                     required: true,
+    //                     message: '请选择结束时间',
+    //                     trigger: 'change'
+    //                 }],
+    //                 addTime: [{
+    //                     required: true,
+    //                     message: '请选择建号时间',
+    //                     trigger: 'change'
+    //                 }],
+    //                 userId: [{
+    //                     required: true,
+    //                     message: '请选择组员',
+    //                     trigger: 'change'
+    //                 }],
+    //                 deptId: [{
+    //                     required: true,
+    //                     message: '请选择分组',
+    //                     trigger: 'change'
+    //                 }],
+    //                 infoNum: [{
+    //                     required: true,
+    //                     message: '请输入数据量',
+    //                     trigger: 'blur'
+    //                 }]
+    //             }
+    //         }
+    //     },
+
+    //     mounted() {
+    //         this.getlist1();
+    //         this.jugde();
+    //     },
+    //     methods: {
+    //         resetForm(formName) {
+    //             this.$refs[formName].resetFields();
+    //         },
+    //         change_group(val) {
+    //             vm.deptId = val;
+    //             vm.getmembers();
+    //         },
+    //         change_user(val) {
+    //             vm.userId = val;
+    //         },
+    //         jugde() {
+    //             $.getJSON(baseURL + "sys/user/info", function (r) {
+    //                 vm.user = r.user;
+    //                 var roleIdList = r.user.roleIdList;
+    //                 roleIdList.forEach(v => {
+    //                     if (v === 11) {
+    //                         vm.c = true;
+    //                         vm.demoshow = true;
+    //                     } else if (v == 13) {
+    //                         vm.c = true;
+    //                     } else if (v === 6) {
+    //                         vm.demoshow = true;
+    //                         vm.b = true;
+    //                     } else if (v === 5) {
+    //                         vm.a = true;
+    //                     } else {
+    //                         vm.demoshow = false;
+    //                     }
+    //                 })
+    //             });
+    //         },
+    //         getmembers() {
+    //             $.ajax({
+    //                 type: "get",
+    //                 dataType: "json",
+    //                 data: {
+    //                     "token": token,
+    //                     "page": 1,
+    //                     "limit": 1000,
+    //                     "onlyStaff": true,
+    //                     "deptId": vm.ruleForm.deptId,
+    //                 },
+    //                 url: "" + baseURL + "sys/user/getUserListByDept",
+    //                 success: function (json) {
+    //                     vm.members = json.body.list;
+    //                 }
+    //             });
+    //         },
+    //         getlist1() {
+    //             $.ajax({
+    //                 type: "get",
+    //                 dataType: "json",
+    //                 data: {
+    //                     "token": token,
+    //                     "page": 1,
+    //                     "limit": 1000,
+    //                 },
+    //                 url: "" + baseURL + "sys/dept/queryAllSellerDepts",
+    //                 success: function (json) {
+    //                     vm.list1 = json.body;
+    //                 }
+    //             });
+    //         },
+    //         formatter(row, column) {
+    //             return row.address;
+    //         },
+    //         submitForm(formName) {
+    //             var data = vm.ruleForm;
+    //             this.$refs[formName].validate((valid) => {
+    //                 if (valid) {
+    //                     if (this.$refs.ruleForm.model.deptId === "0") {
+    //                         vm.deptId = "";
+    //                     }
+    //                     if (this.$refs.ruleForm.model.userId === "0") {
+    //                         vm.userId = "";
+    //                     }
+    //                     vm.btnstatus = true,
+    //                         vm.btnval = "加载中",
+    //                         $.ajax({
+    //                             type: "post",
+    //                             contentType: "application/json",
+    //                             headers: {
+    //                                 "token": token
+    //                             },
+    //                             data: JSON.stringify({
+    //                                 deptId: vm.deptId,
+    //                                 endTime: vm.ruleForm.endTime + " 59:59:59",
+    //                                 infoNum: vm.ruleForm.infoNum,
+    //                                 startTime: vm.ruleForm.startTime + " 00:00:00",
+    //                                 userId: vm.userId,
+    //                             }),
+    //                             url: "" + baseURL + "sys/checkList/createCheckList",
+    //                             success: function (json) {
+    //                                 if (json.status == 200) {
+    //                                     vm.$message({
+    //                                         message: json.body.msg,
+    //                                         type: 'success'
+    //                                     });
+    //                                     vm.resetForm(formName);
+    //                                     vm.btnstatus = false;
+    //                                     vm.btnval = "生成待抽查数据";
+    //                                 }
+    //                                 if (json.status == 400) {
+    //                                     vm.$message({
+    //                                         message: json.body.msg,
+    //                                         type: 'warning'
+    //                                     });
+    //                                     vm.btnstatus = false;
+    //                                     vm.btnval = "生成待抽查数据";
+    //                                 }
+    //                             }
+    //                         });
+    //                 } else {
+    //                     console.log('error submit!!');
+    //                     return false;
+    //                 }
+    //             });
+    //         },
+    //     }
+    // });
+    // $("#li1").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("添加数据");
+    // })  
+    // $("#li2").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("我的数据");
+    // }) 
+    // $("#li3").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("导入数据");
+    // }) 
+    // $("#li4").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("待审核数据");
+    // }) 
+    // $("#li5").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("待抽查数据");
+    // }) 
+    // $("#li6").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("待审核数据");
+    // }) 
+    // $("#li7").click(function(){
+    //     $(window.parent.document).find(".content-header .se").html("待抽查数据");
+    // }) 
+    // $("#li8").click(function(){
+    //     window.location.href="main.html";
+    //     $(window.parent.document).find(".content-header .se").html("生成抽查数据");
+    // })
+</script>
+
+</html>

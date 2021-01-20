@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>万能班长</title>
+    <link rel="Shortcut Icon" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <link rel="Bookmark" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <link href="https://cdn.bootcss.com/animate.css/3.6.2/animate.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #box {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            border: none;
+        }
+
+        .loading-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-text {
+            color: #666;
+            padding: 10px;
+        }
+
+        .notEnterClass {
+            position: fixed;
+            top: 41%;
+            left:38%;
+            font-size: 24px;
+            font-weight: 600;
+            transform: translate(-50%, -50%);
+        }
+
+        #ifr {
+            width: 100%;
+            height: 100%;
+        }
+        .alertMessage{
+            width:80%;
+            border-radius: 10px;
+            height:500px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right:0;
+            bottom:0;
+            margin:auto;
+            z-index:99999;
+            background:rgba(0,0,0,0.8);
+             display: none; 
+        }
+        .alertMessage .alerttitle{
+            text-align: center;
+            font-size: 20px;
+            color:#fff;
+            line-height: 280px;
+        }
+        .alertMessage .downtitle{
+            text-align: center;
+            font-size: 20px;
+            color:#fff;
+            line-height: 230px;
+        }
+        .downtitle .toDownload{
+            width: 140px;
+            font-size: 18px;
+            display: inline-block;
+            text-align: center;
+            color: #fff;
+        }
+        .downtitle .Downloads{
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+        }
+        .ban-sys{
+            width:80%;
+            border-radius: 10px;
+            height:500px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right:0;
+            bottom:0;
+            margin:auto;
+            z-index:99999;
+            background:rgba(0,0,0);
+            display: none;
+        }
+        .ban-sys p{
+            text-align: center;
+            font-size: 30px;
+            color:#fff;
+            line-height: 450px;
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }
+        .mac-alert{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right:0;
+            bottom:0;
+            margin:auto;
+            width: 400px;
+            height: 180px;
+            /* text-align: center; */
+            z-index: 99999;
+            background: rgba(255,255,255,0.9);
+            color:#000;
+            border-radius: 10px;
+            display: none;
+            line-height: 25px;
+        }
+        .mac-alert p{
+            margin:5px 0;
+            padding: 0 10px;
+        }
+        .red{
+            color:red;
+        }
+        .alert-close{
+            position: absolute;
+            top:5px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 18px;
+        }.mac-alert a{
+            padding-top: 10px;
+            /* color:#000; */
+            text-align: center;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='ban-sys'>   
+        <p>检索到您可能在使用录屏软件，请关闭录屏软件</p>
+    </div>
+    <div class="alertMessage">
+        <p class="alerttitle">未成功连接到课堂插件，如果您已下载该插件请先运行后再进入课堂。如果还未下载请先点击下载。</p>
+        <p class='downtitle'>
+            <a class="toDownload" id="macAlert" href="https://classbro-oss.oss-cn-hongkong.aliyuncs.com/statice-resource/20190322/f3fe805b88f44feeabc090b7a6519887.dmg">Mac OS下载</a>
+            <span></span>
+            <!-- <a class="Downloads" href="mac-v.html" target="_Blank">Mac OS使用说明</a> -->
+            <a class="toDownload" href="https://classbro-oss.oss-cn-hongkong.aliyuncs.com/statice-resource/20190322/5259774d0c3e4623a1804ac478d44090.exe">Windows下载</a>
+            <!-- <a class="Downloads" href="windows-v.html" target="_Blank">Windows使用说明</a> -->
+        </p>
+    </div>
+    <div class="mac-alert">
+        <span class="alert-close">×</span>
+        <p style="margin-top:20px;">Mac OS若软件无法启动，请按如下步骤启动：</p>
+        <p>在启动台中打开<span class="red">"ClassBroPlug"</span>没有反应，这时候需要进入到<span class="red">"系统偏好设置"</span>，选择<span class="red">"安全性与隐私"</span>，选择<span class="red">"通用"</span>， 在下面选择<span class="red">"仍要打开"</span>或<span class="red">"强制打开"</span></p>
+        <!-- <div style="width:100%;"> -->
+           <a href="errorMac/mac-v.html" target="_Blank">详细说明请点击这里</a>
+        <!-- </div> -->
+        
+    </div>
+    <div id='box'>
+        
+        <!-- <div class="alertMessage">
+            <p class='alerttitle'>未成功连接到课堂插件如果您已下载请运行课堂插件如果还未下载请点击下载插件</p>
+            <p>
+                <a href="https://classbro-oss.oss-cn-hongkong.aliyuncs.com/statice-resource/20190322/5259774d0c3e4623a1804ac478d44090.exe">Win</a>
+                <a href="https://classbro-oss.oss-cn-hongkong.aliyuncs.com/statice-resource/20190322/f3fe805b88f44feeabc090b7a6519887.dmg">Mac</a>
+            </p>
+        </div> -->
+    </div>
+    <div class="notEnterClass animated pulse infinite">
+    </div>
+</body>
+
+</html>
+<!-- <script src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="ScreenRecordTool.js"></script>
+<script>
+    
+</script>
+<script>
+    $(function () {
+        $('.alert-close').click(function(){
+            $('.mac-alert').css('display', 'none');
+        });
+        $('#macAlert').click(function(){
+            $('.mac-alert').css('display', 'block');
+        })
+
+
+        var baseUrl = 'https://121.43.174.41/';
+        // var baseUrl = 'https://www.classbro.com/';
+        var loadingTemplate = $(
+            '<div class="loading-box"><img class="loading-img" src="' + baseUrl +
+            'static-resource/tkcloud/tkloading.gif" alt=""></div>'
+        );
+        var iframeTemplate = $(
+            '<iframe id="ifr" allowfullscreen="true" allow="camera;microphone;autoplay" name="iframe1"></iframe>'
+        );
+        var userPhone = '';
+        $('.notEnterClass').hide();
+        $('#box').append(loadingTemplate);
+        /*
+         *解码方法
+         */
+        function uncompile(code) {
+            code = unescape(code);
+            var c = String.fromCharCode(code.charCodeAt(0) - code.length);
+            for (var i = 1; i < code.length; i++) {
+                c += String.fromCharCode(code.charCodeAt(i) - c.charCodeAt(i - 1));
+            }
+            return c;
+        }
+        /*
+         *获取当前路径参数
+         *使用：getQueryString(参数名);
+         */
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        };
+
+        var classRoomId = getQueryString('classroomId');
+        // var classroomId = getQueryString('classroomId');
+        var iden = getQueryString('iden');
+        var statusType = getQueryString('iden');
+        var tk = uncompile(getQueryString('tk'));
+
+        // if (statusType == 'stud') {
+            
+        // }else if (statusType == 'teac') {
+            
+        // }
+
+        function confirmStatus(statusType, classroomId) {
+            //学生身份
+            if (statusType == 'stud') {
+                if (tk == null || tk == undefined || tk == '') {
+                    console.error('Error:notoken');
+                    $('.notEnterClass').html('获取身份失败，请关闭后尝试重新进入...').show();
+                    $('#box').empty();
+                    return false;
+                } else {
+                    $.ajax({
+                        // 是否跳过检测  false不跳过检测   true 跳过检测
+                        url: baseUrl + "/api/student/course/isRecordDetection?classroomId="+ classroomId  +"&token=" + tk,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function (result) {
+                            if(result.body == false){
+                                $.ajax({
+                                    url: baseUrl + "/api/banProcess/getBanProcess",
+                                    dataType: 'json',
+                                    type: 'GET',
+                                    success: function (result) {
+                                        console.error(result);
+                                        window.setPlugin = JSON.parse(result.body.msg);
+                                        window.isError = false;
+                                        var socketsTaskList = new CreateNewSocket({
+                                            url:'127.0.0.1:49411/',
+                                            sendData:'TaskList@',
+                                            onOpen:function(ev){
+                                                console.error(ev)
+                                            },
+                                            onMessage:function(ev){
+                                                Task().checkBadTask(ev.data);
+                                                if(typeof window.TkTime == 'object'){
+                                                    window.taskList = window.TkTime.hh + ':' + window.TkTime.mm + ':' + window.TkTime.ss;
+                                                }                                       
+                                            },
+                                            onClose:function(ev){
+                                                console.error('onClose');
+                                            },
+                                            onError:function(er){
+                                                console.error('onError');
+                                            }
+                                        });
+                                        var socketsHeartbeat = new CreateNewSocket({
+                                            url:'127.0.0.1:49411/',
+                                            sendData:'Heartbeat@',
+                                            onOpen:function(ev){
+                                            },
+                                            onMessage:function(ev){
+                                                if(typeof window.TkTime == 'object'){
+                                                    window.heartbeat = window.TkTime.hh + ':' + window.TkTime.mm + ':' + window.TkTime.ss;
+                                                }
+                                            },
+                                            onClose:function(ev){
+
+                                            },
+                                            onError:function(er){
+                                                if(er.type == 'error'){
+                                                    window.isError = true;
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    $.ajax({
+                        url: baseUrl + "/api/student/course/isRecordDetection?classroomId="+ classroomId  +"&token=" + tk,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function (result) {
+                            console.log(result);
+                            //获取手机号码
+                            $.ajax({
+                                url: baseUrl + "api/student/findUserInfo?token=" + tk,
+                                dataType: 'json',
+                                type: 'GET',
+                                contentType: 'application/x-www-form-urlencoded',
+                                success: function (data) {
+                                    userPhone = data.body.mobile;
+                                    //获取教室链接
+                                    $.ajax({
+                                        url: baseUrl + "api/student/course/findClassroomInfo/" +
+                                            classroomId + "?token=" + tk,
+                                        dataType: 'json',
+                                        type: 'GET',
+                                        contentType: 'application/x-www-form-urlencoded',
+                                        success: function (result) {
+                                            if (result.status == 200) {
+                                                // debugger;
+                                                if (result.body.studentJoinUrl == '' || result.body
+                                                    .studentJoinUrl == null || result.body.studentJoinUrl ==
+                                                    undefined) {
+                                                    $('#box').empty();
+                                                    $('.notEnterClass').html('未确认排课，请确认排课后再进入课堂').show();
+                                                    console.error(
+                                                        "Error: studentJoinUrl is undefined"
+                                                    );
+                                                } else {
+                                                    iframeTemplate.attr({
+                                                        // 'src': result.body.studentJoinUrl,
+                                                        // 学生
+                                                        'src': 'https://192.168.1.83:8444/publish/index.html#/login?host=cna.talk-cloud.net&nickname=%E8%8E%89%E8%90%A8&domain=shdbjydemo&param=sDPUlw0RsG7AygGDLxeGYveeOI790ZotWdkc7Bi4i8lDTfgLu7beR4GzS99WynAns9ax5RQgg4x0H2voW46HGRT-yLRT40KLhz6Dg9suUGjk8dlCKV3eOZsP4qy6v4pL0jMqbQz-sjBp8ybBKQ1OGA&timestamp=1557734870&logintype=2&tplId=default&skinId=default&skinResource=&colourid=purple&layout=1',
+                                                        'data-index': userPhone + '&' + tk + '&' + classRoomId + '&' + statusType,
+                                                    });
+                                                    $('#box').empty().append(iframeTemplate);
+                                                    var titleName;
+                                                    if (result.body.name == '' || result.body.name ==
+                                                        undefined || result.body.name == null) {
+                                                        titleName = '万能班长'
+                                                    } else {
+                                                        titleName = result.body.name
+                                                    }
+                                                    document.title = titleName + ' — 授课中...';
+                                                };
+                                            } else if(result.status > 400 && result.status < 499) {
+                                                $('#box').empty();
+                                                $('.notEnterClass').html('进入教室失败，请关闭重新进入...').show();
+                                                console.error(
+                                                    'Error:"api/student/course/findClassroomInfo/" result return error'
+                                                );
+                                            } else if(result.status > 500){
+                                                $('#box').empty();
+                                                $('.notEnterClass').html('服务器错误（1），请联系课程顾问处理...').show();
+                                                console.error(
+                                                    'Error:"api/student/course/findClassroomInfo/" result return error'
+                                                );
+                                            }
+                                        },
+                                        error: function (error) {
+                                            $('#box').empty();
+                                            $('.notEnterClass').html('服务器错误（2），请联系课程顾问处理...').show();
+                                            console.error(
+                                                'Error:api/student/course/findClassroomInfo/'
+                                            );
+                                        },
+                                    });
+                                },
+                                error: function (error) {
+                                    $('#box').empty();
+                                    $('.notEnterClass').html('服务器错误（3），请联系课程顾问处理...').show();
+                                    console.error('Error:api/student/findUserInfo');
+                                },
+                            });
+                        },
+                        error: function (error) {
+                            
+                        }, 
+                    })
+                    
+                }
+            //老师身份
+            } else if (statusType == 'teac') {
+                if (tk == null || tk == undefined || tk == '') {
+                    console.error('Error:notoken');
+                    $('#box').empty();
+                    $('.notEnterClass').html('讲师身份验证失败，请关闭后尝试重新进入...').show();
+                    return false;
+                } else {
+                    $.ajax({
+                        // 是否跳过检测  false不跳过检测   true 跳过检测
+                        url: ""+baseUrl+"/api/teacher/classRoom/isRecordDetection?classroomId="+classroomId+"&token="+tk+"",
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function (result) {
+                            if(result.body == false){
+                                // console.error(result);
+                                $.ajax({
+                                    url: baseUrl + "/api/banProcess/getBanProcess",
+                                    dataType: 'json',
+                                    type: 'GET',
+                                    success: function (result) {
+                                        // console.error(result);
+                                        window.setPlugin = JSON.parse(result.body.msg);
+                                        window.isError = false;
+                                        var socketsTaskList = new CreateNewSocket({
+                                            url:'127.0.0.1:49411/',
+                                            sendData:'TaskList@',
+                                            onOpen:function(ev){
+                                                console.error(ev)
+                                            },
+                                            onMessage:function(ev){
+                                                Task().checkBadTask(ev.data);
+                                                if(typeof window.TkTime == 'object'){
+                                                    window.taskList = window.TkTime.hh + ':' + window.TkTime.mm + ':' + window.TkTime.ss;
+                                                }
+                                            },
+                                            onClose:function(ev){
+                                                console.error('onClose');
+                                            },
+                                            onError:function(er){
+                                                console.error('onError');
+                                            }
+                                        });
+                                        var socketsHeartbeat = new CreateNewSocket({
+                                            url:'127.0.0.1:49411/',
+                                            sendData:'Heartbeat@',
+                                            onOpen:function(ev){
+                                            },
+                                            onMessage:function(ev){
+                                                if(typeof window.TkTime == 'object'){
+                                                    window.heartbeat = window.TkTime.hh + ':' + window.TkTime.mm + ':' + window.TkTime.ss;
+                                                }
+                                            },
+                                            onClose:function(ev){
+
+                                            },
+                                            onError:function(er){
+                                                if(er.type == 'error'){
+                                                    window.isError = true;
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    //获取手机号
+                    $.ajax({
+                        url: baseUrl + "api/teacher/user/findUserInfo?token=" + tk,
+                        dataType: 'json',
+                        type: 'POST',
+                        contentType: 'application/x-www-form-urlencoded',
+                        success: function (data) {
+                            userPhone = data.body.mobile;
+                            //获取教室链接
+                            $.ajax({
+                                url: baseUrl + "api/teacher/classRoom/findClassroomInfo/" +
+                                    classroomId + "?token=" + tk,
+                                dataType: 'json',
+                                type: 'GET',
+                                contentType: 'application/x-www-form-urlencoded',
+                                success: function (result) {
+                                    if (result.status == 200) {
+                                        if (result.body.teacherJoinUrl == '' || result.body
+                                            .teacherJoinUrl == null || result.body.teacherJoinUrl ==
+                                            undefined) {
+                                            console.error(
+                                                'Error:api/teacher/classRoom/findClassroomInfo/ ==> teacherJoinUrl is undefined'
+                                            )
+                                            $('#box').empty();
+                                            $('.notEnterClass').html('未确认排课，请学生确认排课后再进入课堂').show();
+                                        } else {
+                                            iframeTemplate.attr({
+                                                // 'src': result.body.teacherJoinUrl,
+                                                // 讲师
+                                                'src': 'https://192.168.1.83:8444/publish/index.html#/login?host=cna.talk-cloud.net&nickname=BigBrother&domain=shdbjydemo&param=sDPUlw0RsG7vHNQLSwhYn_eeOI790ZotZgHyIcgqtr4Aeg55UZ9zJ7fOQASwfbsqrRCyk32ceGcYr0uGaFj0PpsSDnDPgPmJP6vRQ_d5ID2HPoOD2y5QaOTx2UIpXd45mw_irLq_iks9VEl_M61mf1Yqhn3bcNqP&timestamp=1559096552&logintype=0&video=320*240&tplId=default&skinId=default&skinResource=&colourid=purple&layout=1',
+                                                'data-index': userPhone + '&' + tk + '&' + classRoomId + '&' + statusType,
+
+                                            });
+                                            
+                                            $('#box').empty().append(iframeTemplate);
+                                            var titleName;
+                                            if (result.body.name == '' || result.body.name == undefined || result.body.name == null) {
+                                                titleName = '万能班长'
+                                            } else {
+                                                titleName = result.body.name
+                                            }
+                                            document.title = titleName + ' — 授课中...';
+                                        }
+                                    } else if(result.status > 400 && result.status < 499) {
+                                        $('#box').empty();
+                                        $('.notEnterClass').html('进入教室失败，请关闭重新进入...').show();
+                                        console.error(
+                                            'Error:"api/student/course/findClassroomInfo/" result return error'
+                                        );
+                                    } else if(result.status > 500){
+                                        $('#box').empty();
+                                        $('.notEnterClass').html('服务器错误（4），请联系师资部门处理...').show();
+                                        console.error(
+                                            'Error:"api/student/course/findClassroomInfo/" result return error'
+                                        );
+                                    }
+                                },
+                                error: function (error) {
+                                    console.error(
+                                        'Error:api/teacher/classRoom/findClassroomInfo'
+                                    );
+                                    $('#box').empty();
+                                    $('.notEnterClass').html('服务器错误（5），请联系师资部门处理...').show();
+                                },
+                            });
+                        },
+                        error: function (error) {
+                            $('#box').empty();
+                            $('.notEnterClass').html('服务器错误（5），请联系师资部门处理...').show();
+                            console.error('Error:api/teacher/user/findUserInfo');
+                        },
+                    });
+                    
+                }
+            //巡课身份
+            }else if(statusType == 'tour'){
+                if (tk == null || tk == undefined || tk == '') {
+                    console.error('Error:notoken');
+                    $('.notEnterClass').html('获取身份失败，请关闭后尝试重新进入...').show();
+                    $('#box').empty();
+                    return false;
+                } else {
+                    $.ajax({
+                        url: baseUrl + "crm/sys/oper/findClassroomInfo/" + classroomId,
+                        dataType: 'json',
+                        type: 'GET',
+                        headers:{
+                            token:tk
+                        },
+                        success: function (result) {
+                            console.log(result);
+                            if (result.status == 200) {
+                                if (result.body.tourJoinUrl == '' || result.body
+                                    .tourJoinUrl == null || result.body.tourJoinUrl ==
+                                    undefined) {
+                                    console.error(
+                                        'Error: ==> tourJoinUrl is undefined'
+                                    )
+                                    $('#box').empty();
+                                    $('.notEnterClass').html('未确认排课，请学生确认排课后再进入课堂').show();
+                                } else {
+                                    iframeTemplate.attr({
+                                        'src': result.body.tourJoinUrl,
+                                        // 'src': 'https://192.168.1.254:8448/publish/index.html#/login?host=cna.talk-cloud.net%26domain%3Dshdbjydemo%26param%3DsDPUlw0RsG4KTUu0iHSkks5dUkaUwXgLqxynsUosCe7MVVPfPUYhQMtTdZO7kFdikdhcFTFzc-g9A4llJGp8CUwkxO4MjVFa-WrCduMXIGVwIxNrfUA1j0VbFC7JxvlunB8vxVU-RJk%26timestamp%3D1550564406%26roomtype%3D3%26logintype%3D4',
+                                        'data-index':'classbroTour&' + tk + '&' + classRoomId + '&' + statusType,
+                                    });
+                                    $('#box').empty().append(iframeTemplate);
+                                    var titleName;
+                                    if (result.body.name == '' || result.body.name ==
+                                        undefined || result.body.name == null) {
+                                        titleName = '万能班长'
+                                    } else {
+                                        titleName = result.body.name
+                                    }
+                                    document.title = titleName + ' — 授课中...';
+                                }
+                            } else if(result.status > 400 && result.status < 499) {
+                                $('#box').empty();
+                                $('.notEnterClass').html('进入教室失败，请关闭重新进入...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            } else if(result.status > 500){
+                                $('#box').empty();
+                                $('.notEnterClass').html('服务器错误（4），请联系师资部门处理...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            }
+                        },
+                        error: function (error) {
+                            $('#box').empty();
+                            $('.notEnterClass').html('服务器错误（5），请联系师资部门处理...').show();
+                            console.error('Error:api/teacher/user/findUserInfo');
+                        },
+                    })    
+                }
+            //助教身份
+            } else if(statusType == 'assi'){
+                if (tk == null || tk == undefined || tk == '') {
+                    console.error('Error:notoken');
+                    $('.notEnterClass').html('获取身份失败，请关闭后尝试重新进入...').show();
+                    $('#box').empty();
+                    return false;
+                } else {
+                    $.ajax({
+                        url: baseUrl + "crm/sys/oper/findClassroomInfo/" + classroomId,
+                        dataType: 'json',
+                        type: 'GET',
+                        headers:{
+                            token:tk
+                        },
+                        success: function (result) {
+                            console.log(result);
+                            if (result.status == 200) {
+                                if (result.body.assistantJoinUrl == '' || result.body
+                                    .assistantJoinUrl == null || result.body.assistantJoinUrl ==
+                                    undefined) {
+                                    console.error(
+                                        'Error:crm/sys/oper/findClassroomInfo/ ==> assistantJoinUrl is undefined'
+                                    )
+                                    $('#box').empty();
+                                    $('.notEnterClass').html('未确认排课，请学生确认排课后再进入课堂').show();
+                                } else {
+                                    iframeTemplate.attr({
+                                        'src': result.body.assistantJoinUrl,
+                                        // 'src': 'https://192.168.1.254:8448/publish/index.html#/login?host=cna.talk-cloud.net%26domain%3Dshdbjydemo%26param%3DsDPUlw0RsG4KTUu0iHSkks5dUkaUwXgLfdjClc2eLpmfOnJGMaexcjWq-mw961YHkyMgZ6Ruos6tELKTfZx4Z11jM_ZOsnHJ21jqj3Ogq8AQ_aHSlQV06za4rQqDSvRt0hnft97EVpBVgC-Ac8FgBHL83xPpUOyO%26timestamp%3D1550568004%26roomtype%3D3%26logintype%3D1',
+                                        'data-index':'classbroAssi&' + tk + '&' + classRoomId + '&' + statusType,
+                                    });
+                                    $('#box').empty().append(iframeTemplate);
+                                    var titleName;
+                                    if (result.body.name == '' || result.body.name ==
+                                        undefined || result.body.name == null) {
+                                        titleName = '万能班长'
+                                    } else {
+                                        titleName = result.body.name
+                                    }
+                                    document.title = titleName + ' — 授课中...';
+                                }
+                            } else if(result.status > 400 && result.status < 499) {
+                                $('#box').empty();
+                                $('.notEnterClass').html('进入教室失败，请关闭重新进入...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            } else if(result.status > 500){
+                                $('#box').empty();
+                                $('.notEnterClass').html('服务器错误（4），请联系师资部门处理...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            }
+                        },
+                        error: function (error) {
+                            $('#box').empty();
+                            $('.notEnterClass').html('服务器错误（5），请联系师资部门处理...').show();
+                            console.error('Error:crm/sys/oper/findClassroomInfo/');
+                        },
+                    })    
+                }
+            //steac身份
+            } else if(statusType == 'steac'){
+                if (tk == null || tk == undefined || tk == '') {
+                    console.error('Error:notoken');
+                    $('.notEnterClass').html('获取身份失败，请关闭后尝试重新进入...').show();
+                    $('#box').empty();
+                    return false;
+                } else {
+                    $.ajax({
+                        url: baseUrl + "crm/sys/oper/findClassroomInfo/" + classroomId,
+                        dataType: 'json',
+                        type: 'GET',
+                        headers:{
+                            token:tk
+                        },
+                        success: function (result) {
+                            console.log(result);
+                            if (result.status == 200) {
+                                if (result.body.teacherJoinUrl == '' || result.body
+                                    .teacherJoinUrl == null || result.body.teacherJoinUrl ==
+                                    undefined) {
+                                    console.error(
+                                        'Error:crm/sys/oper/findClassroomInfo/ ==> teacherJoinUrl is undefined'
+                                    )
+                                    $('#box').empty();
+                                    $('.notEnterClass').html('未确认排课，请学生确认排课后再进入课堂').show();
+                                } else {
+                                    iframeTemplate.attr({
+                                        'src': result.body.teacherJoinUrl,
+                                        'data-index':'classbroSTeac&' + tk + '&' + classRoomId + '&' + statusType,
+                                    });
+                                    $('#box').empty().append(iframeTemplate);
+                                    var titleName;
+                                    if (result.body.name == '' || result.body.name ==
+                                        undefined || result.body.name == null) {
+                                        titleName = '万能班长'
+                                    } else {
+                                        titleName = result.body.name
+                                    }
+                                    document.title = titleName + ' — 授课中...';
+                                }
+                            } else if(result.status > 400 && result.status < 499) {
+                                $('#box').empty();
+                                $('.notEnterClass').html('进入教室失败，请关闭重新进入...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            } else if(result.status > 500){
+                                $('#box').empty();
+                                $('.notEnterClass').html('服务器错误（4），请联系师资部门处理...').show();
+                                console.error(
+                                    'Error:"crm/sys/oper/findClassroomInfo/" result return error'
+                                );
+                            }
+                        },
+                        error: function (error) {
+                            $('#box').empty();
+                            $('.notEnterClass').html('服务器错误（5），请联系师资部门处理...').show();
+                            console.error('Error:crm/sys/oper/findClassroomInfo/');
+                        },
+                    })    
+                }
+            }
+        };
+        confirmStatus(iden, classRoomId);
+
+        //父页面接受从子页面发送的消息回调函数
+        var TkTimers = setInterval(function(){
+            window.addEventListener("message", receiveMessageFromIframePage, false);
+            // console.error(typeof window.TkTime);
+            if(typeof window.TkTime != 'object'){
+                window.TkTime = '00:00:00'
+            }
+            console.error(window.TkTime);
+        },1000);
+        function receiveMessageFromIframePage(event) {      
+            window.TkTime = JSON.parse(event.data.msg);
+            var iFrame = document.getElementById('ifr');
+            var v = JSON.stringify(iFrame.getAttribute("data-index"));
+            // iFrame = document.getElementById('ifr')
+            iFrame.contentWindow.postMessage(v, '*');
+            // sendMessageToChild(v);
+        }
+        
+
+        //监听message事件
+
+        //发送消息给子页面
+        // function sendMessageToChild(text) {
+        //     iFrame = document.getElementById('ifr')
+        //     iFrame.contentWindow.postMessage(text, '*');
+        //     // console.log(text);
+        // }
+
+
+
+    });
+</script>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+            <el-button type="primary" @click="search">搜索</el-button>
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+          label="时间"
+          width="170">
+          <template slot-scope="scope">
+            <span>{{ scope.row.createAt }}</span>
+          </template>
+       </el-table-column>
+            <el-table-column
+              label="销售名称"
+              width="80">
+              <template slot-scope="scope">
+                <span>{{ scope.row.sellerName }}</span>
+              </template>
+           </el-table-column>
+           <el-table-column
+           label="学生名称"
+           width="80">
+           <template slot-scope="scope">
+             <span>{{ scope.row.nickName }}</span>
+           </template>
+        </el-table-column>
+           <el-table-column
+           label="充值方式"
+           width="120">
+           <template slot-scope="scope">
+              <el-tag v-if='scope.row.postWay===1'>支付宝充值</el-tag>
+              <el-tag v-if='scope.row.postWay===2'>微信充值</el-tag>
+              <el-tag v-if='scope.row.postWay===3'>PayPal</el-tag>
+              <el-tag v-if='scope.row.postWay===4'>转账</el-tag>
+           </template>
+        </el-table-column>
+           <el-table-column 
+           label="转账金额"
+           width="90">
+           <template slot-scope="scope">
+            <span>{{ scope.row.money }}</span>
+          </template>
+          </el-table-column>
+            <el-table-column 
+             label="货币"
+             width="80">
+             <template slot-scope="scope">
+              <span>{{ scope.row.current }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="凭证"
+            width="120">
+            <template slot-scope="scope">
+             <a v-for="thumbPaths in scope.row.thumbPaths" :href="thumbPaths" target="_Blank"><img :src="thumbPaths" style="width:50px;height:50px;margin-right:10px;border:1px solid #ddd"></a>
+           </template>
+           </el-table-column>
+            <el-table-column 
+            label="坏账金额"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.temCourseName }}</span>
+            </template>
+           </el-table-column>
+           <el-table-column 
+           label="详情"
+           width="110">
+           <template slot-scope="scope">
+             <span>{{ scope.row.description }}</span>
+           </template>
+          </el-table-column>description
+            <el-table-column label="操作">  
+                <template slot-scope="scope">  
+                <el-button size="mini" @click="yes(scope.row,scope.$index)">通过</el-button> 
+                <el-button size="mini" @click="no(scope.row,scope.$index)">不通过</el-button>   
+                </template>  
+            </el-table-column> 
+            </el-table>
+
+            <el-dialog
+            :visible.sync="mm"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="description">
+                  <el-input v-model="ruleForm.description"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      mm:false,  
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      filterTableDataEnd:[],
+      idss:[],
+      options:[],
+      selectedOptions: [],
+      selects:'',
+      countryId:'',
+      key:'',
+      courseId:'',
+      val:1,
+      page:"",
+      name:'',
+      superId:'',
+      label:'',
+      dialogStatus: "",
+      ruleForm: {
+        },
+        rules: {
+          description: [
+            { required: true, message: '请填写不通过理由', trigger: 'blue' }
+          ],
+        }
+      }
+ },
+ multipleSelection: [],
+ mounted() {
+  this.getTableData(); 
+ },
+ methods: {
+  search:function(){  
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": 1,
+            "limit": 6,
+            "id":vm.tableDataName 
+          } ,
+          url : ""+baseURL+"sys/seller/order/getOrderPool/info",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      },
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": 6 ,
+            "statused" : 0,
+            "type" : 10,
+            "postWay": 4
+          } ,
+          url : ""+baseURL+"sys/finance/audit/queryStudAccountLog",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }
+      });    
+      },
+
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+yes(row,index){
+  var self = this;  
+  self.$confirm('是否通过审核?', '提示', {
+  confirmButtonText: '确定',
+  cancelButtonText: '取消',
+  type: 'warning'
+  })
+.then(_ => {
+  var token = localStorage.getItem("token");
+    $.ajax({  
+      type : "POST",  
+      dataType: "json", 
+      data:{
+        "token": token,
+        "logId": row.id,
+        "status": 1
+      } ,
+      url : ""+baseURL+"sys/finance/audit/auditStud",  
+      success : function(json) {  
+      if(json.status == "400"){
+        vm.$message({
+        message: "审批失败",
+        type: 'warning'
+        });
+        vm.getTableData(); 
+        }
+      if(json.status == "200"){
+        vm.$message({
+        message: "审批成功",
+        type: 'success'
+      });
+      vm.getTableData(); 
+      }
+      }
+  }); 
+})
+.catch(() => {  });
+},
+no(row,index){
+  var self = this;  
+  vm.mm = true;
+  vm.s1 = row.id;
+//   self.$confirm('是否通过审核?', '提示', {
+//   confirmButtonText: '确定',
+//   cancelButtonText: '取消',
+//   type: 'warning'
+//   })
+// .then(_ => {
+//   var token = localStorage.getItem("token");
+//     $.ajax({  
+//       type : "POST",  
+//       dataType: "json", 
+//       data:{
+//         "token": token,
+//         "logId": row.id,
+//         "status": 2
+//       } ,
+//       url : ""+baseURL+"sys/finance/audit/auditStud",  
+//       success : function(json) {  
+//       if(json.status == "400"){
+//         vm.$message({
+//         message: "审批失败",
+//         type: 'warning'
+//         });
+//         vm.getTableData(); 
+//         }
+//       if(json.status == "200"){
+//         vm.$message({
+//         message: "审批成功",
+//         type: 'success'
+//       });
+//       vm.getTableData(); 
+//       }
+//       }
+//   }); 
+// })
+// .catch(() => {  });
+},
+ handleCurrentChange(val) {
+  vm.val = val;
+  this.getTableData(); 
+ },
+ save(formName) {
+      var self = this;
+      this.$refs[formName].validate((valid) => {
+      if (valid) {
+        $.ajax({  
+          type : "post",  
+          dataType: "json", 
+          headers: {"token": token},
+          data:{
+            description: this.$refs.ruleForm.model.description,
+            logId: vm.s1,
+            status: 2
+          },
+          url : ""+baseURL+"sys/finance/audit/auditStud",  
+          success : function(json) {  
+            if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.mm=false;
+            setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            vm.mm=false;
+            setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+            }
+          }
+      });
+      }
+    });
+  },  
+handleSelectionChange(val) {
+  this.multipleSelection = val;
+  let ids = [];
+  this.multipleSelection.map((item)=> {
+    var id = item.id;
+  ids.push(""+id+"");
+  });
+  this.selectedIDs = ids;
+  console.log('多选',ids);
+  this.idss =  this.selectedIDs;
+  console.log(this.idss);
+},     
+resetForm(formName) {
+  this.$refs[formName].resetFields();
+},
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

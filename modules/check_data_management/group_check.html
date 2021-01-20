@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;" :default-sort="{prop: 'date', order: 'descending'}">
+            <el-table-column type="selection" width="50">
+            </el-table-column>
+            <el-table-column width="50" label="id">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="图片">
+                <template slot-scope="scope">
+                    <div style="width:375px;"><img :src="scope.row.fileUrl" style="margin-right:10px;border:1px solid #ddd;cursor:pointer"></div>
+                </template>
+            </el-table-column>
+            <el-table-column width="110" label="操作">
+                <template slot-scope="scope">
+                    <!-- <el-button type="primary" size="mini" @click="del(scope.row,scope.$index)" icon="el-icon-delete">删除</el-button> -->
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog :visible.sync="dialogVisible" width="30%" style="margin-left:230px;text-align:center">
+            <img :src="imgurl">
+        </el-dialog>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm" style="width:500px;margin-top:10px">
+            <el-form-item label="审核" prop="region1">
+                <el-select v-model="ruleForm.region1" @change="res_change">
+                    <el-option label="通过" value="1"></el-option>
+                    <el-option label="不通过" value="2"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="请选择不通过原因" prop="reason" v-show="resshow">
+                <el-select v-model="ruleForm.reason" placeholder="请选择不通过原因" style="width:250px;">
+                    <el-option v-for="item in reasons" :key="item.id" :label="item.exceptionName" :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="原因" prop="groupCheckDesc" v-show="resshow">
+                <el-input type="textarea" :rows="5" v-model="ruleForm.groupCheckDesc"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="../../js/base.js"></script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                checkstatus: '',
+                resshow: false,
+                reasons: '',
+                btnstatus: false,
+                btnval: '提 交',
+                tableDataEnd: [],
+                imgurl: '',
+                dialogVisible: false,
+                ruleForm: {
+                    groupCheckDesc: '',
+                    region1: '',
+                    reason: '',
+                },
+                rules: {
+                    region: [{
+                        required: true,
+                        message: '请选择审核状态',
+                        trigger: 'change'
+                    }],
+                    // reason: [
+                    //   { required: true, message: '请选择原因', trigger: 'change' }
+                    // ],
+                    // description: [
+                    //   { required: true, message: '请输入原因', trigger: 'blue' }
+                    // ]
+                }
+            }
+        },
+
+        mounted() {
+            this.getcheckdata();
+            this.getreason();
+        },
+        methods: {
+            getcheckdata() {
+                getUrlStr = function (name) {
+                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                };
+                var id = getUrlStr("id");
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "id": id,
+                    },
+                    url: "" + baseURL + "sys/checkList/getCheckInfo",
+                    success: function (json) {
+                        vm.tableDataEnd = json.body.upfileLists;
+                    }
+                });
+            },
+            see_img(row, index) {
+                vm.imgurl = row.fileUrl;
+                vm.dialogVisible = true;
+            },
+            del(row, index) {
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    $.ajax({
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "token": token,
+                            "id": row.id,
+                        },
+                        url: "" + baseURL + "sys/checkList/deleteImage",
+                        success: function (res) {
+                            if (res.status == 200) {
+                                vm.$message({
+                                    message: res.body.msg,
+                                    type: 'success'
+                                });
+                                vm.getcheckdata();
+                            }
+                        }
+                    });
+                }).catch(() => {});
+            },
+            submitForm(formName) {
+                getUrlStr = function (name) {
+                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                };
+                var id = getUrlStr("id");
+                let self = this;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        vm.btnstatus = true;
+                        vm.btnval = "加载中";
+                        $.ajax({
+                            type: "post",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                "token": token,
+                                "checkIds": [id],
+                                "groupCheckStatus": vm.checkstatus,
+                                "groupExceptionTypeId": vm.ruleForm.reason,
+                                "groupCheckDesc": vm.ruleForm.groupCheckDesc,
+                            }),
+                            url: "" + baseURL + "sys/checkList/putCheckResultByGroup",
+                            success: function (json) {
+                                if (json.status == 200) {
+                                    vm.$message({
+                                        message: json.body.msg,
+                                        type: 'success'
+                                    });
+                                    vm.btnstatus = false;
+                                    vm.btnval = "提 交";
+                                    vm.$refs[formName].resetFields();
+                                }
+                                if (json.status == 400) {
+                                    vm.$message({
+                                        message: json.body.msg,
+                                        type: 'warning'
+                                    });
+                                    vm.btnstatus = false;
+                                    vm.btnval = "提 交";
+                                }
+                            }
+                        });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            getreason() {
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": 1,
+                        "limit": 1000,
+                        "type": 1,
+                    },
+                    url: "" + baseURL + "sys/basedata/exceptionList/list",
+                    success: function (json) {
+                        vm.reasons = json.body.list;
+                    }
+                });
+            },
+            res_change(val) {
+                if (val == 1) {
+                    vm.resshow = false;
+                    vm.checkstatus = 1;
+                } else {
+                    vm.resshow = true;
+                    vm.checkstatus = 2;
+                }
+            },
+        }
+    });
+</script>
+</body>
+
+</html>
+
+</html>

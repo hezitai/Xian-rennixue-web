@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div id="app">
+  <template>
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="基本信息" name="first"></el-tab-pane>
+      <el-tab-pane label="高级设置" name="second"></el-tab-pane>
+      <el-tab-pane label="考核列表" name="testlist"></el-tab-pane>
+    </el-tabs>
+  </template>
+  <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" style="width:800px;" class="demo-ruleForm">
+      <div v-show="!showa">
+      <el-form-item label="手机号" prop="mobile">
+        <el-input v-model="ruleForm.mobile"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="ruleForm.password"></el-input>
+      </el-form-item>
+      <el-form-item label="姓名" prop="nickName">
+        <el-input v-model="ruleForm.nickName"></el-input>
+      </el-form-item>
+      <el-form-item label="选择国家" prop="country">
+          <el-select v-model="ruleForm.country" placeholder="请选择国家" @change="change_country">
+            <el-option
+              v-for="item in countrys"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="选择学校" prop="universityName">
+          <el-select v-model="ruleForm.universityName" placeholder="请选择学校" @change="change_university">
+            <el-option
+              v-for="item in universitys"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="专业" prop="professionalCourses">
+          <el-select v-model="ruleForm.professionalCourses" multiple placeholder="请选择" @change="change_professionalCourse">
+            <el-option
+              v-for="item in professionalCoursesNames"
+              :key="item.value"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学历" prop="eduName">
+          <el-select v-model="ruleForm.eduName" placeholder="请选择学历">
+            <el-option label="本科" value="1"></el-option>
+            <el-option label="研究生" value="2"></el-option>
+            <el-option label="硕士" value="3"></el-option>
+            <el-option label="博士" value="4"></el-option>
+            <el-option label="博士后" value="5"></el-option>
+            <el-option label="教授" value="6"></el-option>
+            <el-option label="院士" value="7"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="擅长学科" prop="specializeds">
+          <el-select v-model="ruleForm.specializeds" multiple placeholder="请选择" @change="change_specializeds">
+            <el-option
+              v-for="item in specializedss"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      <el-form-item label="性别" prop="sex">
+        <el-select v-model="ruleForm.sex" placeholder="请选择性别">
+          <el-option label="男" value="MALE"></el-option>
+          <el-option label="女" value="FEMALE"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="生日">
+        <el-col :span="11">
+          <el-form-item prop="birthday">
+            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.birthday" value-format="yyyy-MM-dd HH:mm:ss" style="width: 100%;"></el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-form-item>
+      <el-form-item label="微信号" prop="wxAccount">
+        <el-input v-model="ruleForm.wxAccount"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="ruleForm.email"></el-input>
+      </el-form-item>
+      <el-button type="primary" @click="next()" style="margin-left:50%;">下一步</el-button>
+      </div>
+      <div v-show="!showb">
+        <el-form-item label="老师类型" prop="type">
+          <el-select v-model="ruleForm.type" placeholder="请输入老师类型" @change="change">
+            <el-option label="全职" value="1"></el-option>
+            <el-option label="兼职" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="兼职老师类型" prop="grade" v-show="!show" id="gread">
+          <el-select v-model="ruleForm.grade" placeholder="请输入老师类型" @change="change_gread">
+            <el-option label="银牌讲师" value="1"></el-option>
+            <el-option label="金牌讲师" value="2"></el-option>
+            <el-option label="王牌老师" value="3"></el-option>
+          </el-select>
+        </el-form-item> 
+        <el-form-item label="时薪" prop="hourlyWage">
+          <el-input v-model="ruleForm.hourlyWage" style="width:215px":disabled="true"></el-input>
+          <el-button v-show="dw">G/H</el-button>
+        </el-form-item>
+        <el-form-item label="授课经验" prop="teachingExperience">
+          <el-input v-model="ruleForm.teachingExperience" style="width:215px"></el-input>
+          <el-button>年</el-button>
+        </el-form-item>
+        <el-form-item label="赠送时长" prop="presenterTimeLimit">
+          <el-input v-model="ruleForm.presenterTimeLimit" style="width:215px"></el-input>
+          <el-button>分钟</el-button>
+        </el-form-item>
+        <el-form-item label="最大抢单数" prop="maxLootNum">
+          <el-input v-model="ruleForm.maxLootNum" style="width:215px"></el-input>
+          <el-button>个</el-button>
+        </el-form-item>
+        <el-button type="primary" @click="next1()" style="margin-left:50%;">下一步</el-button>
+      </div>
+      <div v-show="!showc">
+        <p>复试</p>
+          <el-form-item label="辅导技巧" prop="coachingSkills">
+              <el-select v-model="ruleForm.coachingSkills" placeholder="请输入辅导技巧">
+                <el-option label="1分" value="1"></el-option>
+                <el-option label="2.1分" value="2.1"></el-option>
+                <el-option label="2.2分" value="2.2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="专业知识" prop="proKnowledge">
+              <el-select v-model="ruleForm.proKnowledge" placeholder="请输入专业知识">
+                  <el-option label="1分" value="1"></el-option>
+                  <el-option label="2.1分" value="2.1"></el-option>
+                  <el-option label="2.2分" value="2.2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="工作态度" prop="workingAttitude">
+              <el-select v-model="ruleForm.workingAttitude" placeholder="请输入工作态度">
+                  <el-option label="1分" value="1"></el-option>
+                  <el-option label="2.1分" value="2.1"></el-option>
+                  <el-option label="2.2分" value="2.2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="工作规范" prop="jobSpecification">
+              <el-select v-model="ruleForm.jobSpecification" placeholder="请输入工作态度">
+                  <el-option label="1分" value="1"></el-option>
+                  <el-option label="2.1分" value="2.1"></el-option>
+                  <el-option label="2.2分" value="2.2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="培训1评价" prop="rate1">
+              <el-input v-model="ruleForm.rate1" style="width:210px;"></el-input>
+            </el-form-item>
+            <el-form-item label="培训2评价" prop="rate2">
+              <el-input v-model="ruleForm.rate2" style="width:210px;"></el-input>
+            </el-form-item>
+            <el-form-item label="培训3评价" prop="rate3">
+              <el-input v-model="ruleForm.rate3" style="width:210px;"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}</el-button>
+            </el-form-item>
+      </div>
+    </el-form>
+</div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        btnstatus:false,
+        btnval:"生成教师账号",
+        dw:false,
+        show:false,
+        ruleForm: {
+        university:'',
+        gread:'',
+        hourlyWage:'',
+        },
+        professionalCourses:'',
+        activeName: 'first',
+        countrys:'',
+        universitys:'',
+        showa:false,
+        showb:true,
+        showc:true,
+        id:'',
+        name:'',
+        specializedss:'',
+        specializeds:'',
+        professionalCoursesName:'',
+        professionalCoursesNames:'',
+        rules: {
+          nickName: [
+            { required: true, message: '请输入教师姓名', trigger: 'blur' },
+          ],
+          mobile: [
+            { required: true, message: '请输入教师手机号', trigger: 'blur' },
+          ],
+          password: [
+            { required: true, message: '请输入教师密码', trigger: 'blur' },
+          ],
+          coachingSkills: [
+            { required: true, message: '请输入教师辅导技巧', trigger: 'change' },
+          ],
+          proKnowledge: [
+            { required: true, message: '请输入专业知识评级', trigger: 'change' },
+          ],
+          workingAttitude: [
+            { required: true, message: '请输入工作态度评级', trigger: 'change' },
+          ],
+          jobSpecification: [
+            { required: true, message: '请输入工作规范评级', trigger: 'change' },
+          ],
+          professionalCourses: [
+            { required: true, message: '请选择专业名称', trigger: 'change' },
+          ],
+          specializeds: [
+            { required: true, message: '请选择擅长学科', trigger: 'change' },
+          ],
+          type: [
+            { required: true, message: '请选择老师类型', trigger: 'change' },
+          ],
+          eduName: [
+            { required: true, message: '请选择老师学历', trigger: 'change' },
+          ],
+          universityName: [
+            { required: true, message: '请选择大学', trigger: 'change' },
+          ],
+          country: [
+            { required: true, message: '请选择国家', trigger: 'change' }
+          ]
+        }
+      };
+    },
+  mounted() {
+  this.getcountry(); 
+  this.getprofessionalCoursesName();
+  this.getspecializeds();
+ },
+    methods: {
+      getcountry(){
+        $.ajax({
+            type: "get",
+            url: ""+baseURL+"sys/basedata/country/list",
+            dataType: "json", 
+            data: {
+              "token": token,
+              "page": 1,
+              "limit": 1000
+              },
+              success: function(r){
+                vm.countrys = r.body.list;
+            }
+				});
+      },
+      change_gread(val){
+        if(val == 1){
+          vm.ruleForm.hourlyWage = 100;
+        }
+        if(val == 2){
+          vm.ruleForm.hourlyWage = 120;
+        }
+        if(val == 3){
+          vm.ruleForm.hourlyWage = 150;
+        }
+      },
+      change_country(val){
+        vm.$refs.ruleForm.model.university = "";
+        $.ajax({
+            type: "get",
+            url: ""+baseURL+"sys/basedata/university/list",
+            dataType: "json", 
+            data: {
+              "token": token,
+              "page": 1,
+              "limit": 1000,
+              "countryId":val
+              },
+              success: function(r){
+                vm.universitys = r.body.list;
+            }
+				});
+      },
+      change_university(val){
+        let obj = {};
+          obj = this.universitys.find((item)=>{
+              return item.id === val;
+          });
+          vm.universityId = obj.id;
+          vm.universityName = obj.name;
+      },
+
+      getuniversity(){
+        $.ajax({
+            type: "get",
+            url: ""+baseURL+"sys/basedata/university/list",
+            dataType: "json", 
+            data: {
+              "token": token,
+              "page": 1,
+              "limit": 1000
+              },
+              success: function(r){
+                vm.universitys = r.body.list;
+            }
+				});
+      },
+
+      change_professionalCourse(val){
+        vm.professionalCoursesName = val;
+      },
+      change_specializeds(val){
+        vm.specializeds = val;
+      },
+      getprofessionalCoursesName(){
+        $.ajax({
+            type: "get",
+            url: ""+baseURL+"sys/basedata/professionalCourses/list",
+            dataType: "json", 
+            data: {
+              "token": token,
+              "page": 1,
+              "limit": 1000
+              },
+              success: function(r){
+                vm.professionalCoursesNames = r.body.list;
+            }
+				});
+      },
+      getspecializeds(){
+        $.ajax({
+            type: "get",
+            url: ""+baseURL+"sys/basedata/specialtyCourses/list",
+            dataType: "json", 
+            data: {
+              "token": token,
+              "page": 1,
+              "limit": 1000
+              },
+              success: function(r){
+                vm.specializedss = r.body.list;
+            }
+				});
+      },
+  next(){
+  vm.showa = true;
+  vm.showb = false;
+  vm.showc = true;
+  vm.activeName='second';
+}, 
+next1(){
+  vm.showa = true;
+  vm.showb = true;
+  vm.showc = false;
+  vm.activeName='testlist';
+}, 
+      submitForm(formName) {
+        var self = this;
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            vm.btnstatus=true;
+            vm.btnval="加载中";
+        var coachingSkills = Number(this.$refs.ruleForm.model.coachingSkills);
+        var proKnowledge = Number(this.$refs.ruleForm.model.proKnowledge);
+        var workingAttitude = Number(this.$refs.ruleForm.model.workingAttitude);
+        var jobSpecification = Number(this.$refs.ruleForm.model.jobSpecification);
+        var eduName = Number(this.$refs.ruleForm.model.eduName);
+        var type = Number(this.$refs.ruleForm.model.type);
+        var hourlyWage = Number(this.$refs.ruleForm.model.hourlyWage);
+        if(this.$refs.ruleForm.model.grade == undefined){
+          grade = null;
+        }else{
+          grade = Number(this.$refs.ruleForm.model.grade);
+        }
+        var teachingExperience = Number(this.$refs.ruleForm.model.teachingExperience);
+            $.ajax({
+              type: "POST",
+              headers: {"token": token},
+              url: ""+baseURL+"/sys/train/saveTeac",
+              contentType: "application/json",
+              data: JSON.stringify({
+                    trainTeacNames: [""+this.$refs.ruleForm.model.rate1+"",""+this.$refs.ruleForm.model.rate2+"",""+this.$refs.ruleForm.model.rate3+""],
+                    username:this.$refs.ruleForm.model.username,
+                    password:this.$refs.ruleForm.model.password,
+                    mobile:this.$refs.ruleForm.model.mobile,
+                    nickName:this.$refs.ruleForm.model.nickName,
+                    sex:this.$refs.ruleForm.model.sex,
+                    birthday:this.$refs.ruleForm.model.birthday,
+                    universityId:vm.universityId,
+                    universityName:vm.universityName,
+                    professionalIds:vm.professionalCoursesName,
+                    eduBackgroundId:eduName,
+                    specializedIds:vm.specializeds,
+                    wxAccount:this.$refs.ruleForm.model.wxAccount,
+                    email:this.$refs.ruleForm.model.wxAccount,   
+                    // hourlyWage:hourlyWage,
+                    hourlyWage:1,
+                    teachingExperience:this.$refs.ruleForm.model.teachingExperience,
+                    presenterTimeLimit:this.$refs.ruleForm.model.presenterTimeLimit,
+                    maxLootNum:this.$refs.ruleForm.model.maxLootNum,
+                    type:type,
+                    grade:grade,
+                    teacRate:{
+                        coachingSkills:coachingSkills,
+                        proKnowledge:proKnowledge,
+                        workingAttitude:workingAttitude,
+                        jobSpecification:jobSpecification,
+                    }
+                }),
+                success: function(r){
+                  if(r.status == 200){
+                    self.$message({
+                    message: r.body.msg,
+                    type: 'success'
+                  });
+                  vm.btnstatus=true;
+                  vm.btnval="确 定";
+                  window.location.reload();
+                  }
+                  if(r.status == 400){
+                    self.$message({
+                    message: r.body.msg,
+                    type: 'warning'
+                  });
+                  vm.btnstatus=true;
+                  vm.btnval="确 定";
+                  window.location.reload();
+                  }
+              }
+				});
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+  change(value){
+    if(value == 1){
+      vm.show = true;
+      vm.ruleForm.hourlyWage = 1;
+      vm.dw = true;
+     // $("#gread").css("display","none");
+    }else{
+      //$("#gread").css("display","block");
+      vm.show = false;
+      vm.ruleForm.hourlyWage = "";
+      vm.dw = false;
+    }
+  },     
+handleClick(tab, first) {
+  var val = tab.index;
+  if(val == 0){
+    vm.showa = false;
+    vm.showb = true;
+    vm.showc = true;
+  }
+  if(val == 1){
+    vm.showa = true;
+    vm.showb = false;
+    vm.showc = true;
+  }
+  if(val == 2){
+    vm.showa = true;
+    vm.showb = true;
+    vm.showc = false;
+  }
+},  
+  }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

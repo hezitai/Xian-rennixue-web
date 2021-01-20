@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .demo-ruleForm{
+    width:50%;
+    margin: 0 auto;
+  }
+  .el-row {
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }
+  .actived{
+    background: #409EFF !important;
+    color: #fff;
+  }
+  .datas p{
+    float: left;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    list-style: none;
+    padding: 4px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    background: #ddd;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .span, .datas{
+    float: left;
+  }
+  .fl{
+    float: left;
+  }
+  .fldata{
+    margin-left: 10px;
+  }
+  .wx-dialog-box .title-span{
+    width: 300px;text-align: right;display: inline-block;padding: 10px;font-size: 18px;
+  }
+</style>
+
+<body>
+    <div id="app">
+        <div>
+            <template>
+                <!-- @tab-click="handleClick" disabled-->
+                <el-tabs v-model="activeName" stretch @tab-click="handleClick">
+                    <el-tab-pane v-for='item in groups' :disabled="disabledOnOff" :label="item.name" :name="item.name"
+                        :value="item.deptId" :key="item.deptId" :data-id='item.deptId'></el-tab-pane>
+                </el-tabs>
+            </template>
+        </div>
+        <div class="el-row">
+            <span style="line-height: 40px;" class="span">按专员筛选:</span>
+            <div class="datas">
+                <!-- <p v-bind:class="{actived: ismember1}" @click="group_all">全部</p> @change="change_getmember" @change="change_wxid"-->
+                <el-select v-model="getmemberId" :disabled="disabledOnOff" filterable style="margin-left:10px;" @change="changeUser">
+                    <el-option label="全部" value=""></el-option>
+                    <el-option v-for="item in members" :key="item.id" :label="item.username" :value="item.userId">
+                    </el-option>
+                </el-select>
+            </div>
+            <span style="line-height: 40px;margin-left: 20px;" class="span">按微信号筛选:</span>
+            <div class="datas">
+                <el-select v-model="wx" filterable placeholder="请选择关联微信号" style="margin-left:10px;" @change="changeWx">
+                    <el-option label="全部" value=""></el-option>
+                    <el-option v-for="item in wxaccounts" :key="item.id" :label="item.wxAccount" :value="item.id">
+                    </el-option>
+                </el-select>
+            </div>
+        </div>
+        <div style="border:1px solid #ccc;padding: 0 15px 15px 15px; margin-top:20px;" v-for='x in wxData'>
+            <p style="color:#777;margin-left:10px;">姓名：{{x.username}}</p>
+            <template>
+                <el-table :data="x.bindWxAccounts" style="width: 100%">
+                    <el-table-column align="center" label="微信账号">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.wxAccount }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column align="center" label="绑定学校">
+                        <template slot-scope="scope">
+                            <p v-for='item in scope.row.sysUniversities'>
+                                <span>{{ item.name }}</span>
+                            </p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column align="center" label="微信好友数">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.friendNum }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column align="center" label='操作'>
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini" @click="checkWxInfo(scope.row)" plain>查看微信号</el-button><span>
+                                丨 </span>
+                            <el-button type="primary" size="mini" @click="checkSchoolInfo(scope.row.sysUniversities)"
+                                plain>查看学校</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </template>
+        </div>
+
+        <p v-if='wxData.length == 0' style="text-align:center;line-height:300px;color:#777;">{{loadingText}}</p>
+
+        <el-dialog title="查看微信号信息" :visible.sync="dialogVisible" width="50%">
+            <div class="wx-dialog-box">
+                <div><span class="title-span">微信账号：</span><span class="content-span">{{WxDialogData.wxAccount}}</span></div>
+                <div><span class="title-span">微信密码：</span><span class="content-span">{{WxDialogData.wxPassword}}</span></div>
+                <div><span class="title-span">微信昵称：</span><span class="content-span">{{WxDialogData.wxName}}</span></div>
+                <div><span class="title-span">微信创建人：</span><span class="content-span">{{WxDialogData.signinUser}}</span></div>
+                <div><span class="title-span">建号时间：</span><span class="content-span">{{WxDialogData.signupTime}}</span></div>
+                <div><span class="title-span">当前好友数：</span><span class="content-span">{{WxDialogData.friendNum}}</span></div>
+                <div><span class="title-span">当前系统有效数据：</span><span class="content-span">{{WxDialogData.reaFriendNum}}</span></div>
+                <div><span class="title-span">使用人：</span><span class="content-span">{{WxDialogData.operatorName}}</span></div>
+                <div><span class="title-span">实名认证人：</span><span class="content-span">{{WxDialogData.signinUser}}</span></div>
+                <div><span class="title-span">绑定手机号：</span><span class="content-span">{{WxDialogData.bindPhone}}</span></div>
+                <div><span class="title-span">支付密码：</span><span class="content-span">{{WxDialogData.payPassword}}</span></div>
+                <!-- <p>紧急联系人：</p> -->
+                <div v-for='(x, index) in WxDialogData.wxEmergencyContacts'>
+                    <div><span class="title-span" style="width:200px;">第{{index + 1}}位紧急联系人：</span></div>
+                    <div><span class="title-span">微信昵称：</span><span class="content-span">{{x.userName}}</span></div>
+                    <div><span class="title-span">微信ID：</span><span class="content-span">{{x.userPhone}}</span></div>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
+                <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog title="查看学校信息" :visible.sync="dialogVisible1" width="50%">
+            <div class="school-dialog-box">
+                <template>
+                    <el-table :data="SchoolDialogData" style="width: 100%">
+                        <el-table-column label="国家">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.countryName }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="学校">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.name }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="所属微信号">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.sysWxAcountName }}</span>
+                            </template>
+                        </el-table-column>
+                        <!-- <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.countryName }}</span>
+                            </template>
+                        </el-table-column> -->
+                    </el-table>
+                </template>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <!-- <el-button @click="dialogVisible1 = false">取 消</el-button> -->
+                <el-button type="primary" @click="dialogVisible1 = false">关 闭</el-button>
+            </span>
+        </el-dialog>
+    </div>
+
+
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<!-- <script src="../../js/common.js"></script> -->
+<script src="../../js/base.js"></script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                activeName: '',
+                activeId: '',
+                activeTab: 12,
+                groups: [],
+                members: [],
+                wxaccounts: [],
+                getmemberId: '',
+                wx: '',
+                disabledOnOff: false,
+                deptId: 12,
+                userId: '',
+                wxId: '',
+                page: 1,
+                limit: 1000,
+                tableData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1517 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1519 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1516 弄'
+                }],
+                wxData: [],
+                dialogVisible: false,
+                dialogVisible1: false,
+                WxDialogData: '',
+                SchoolDialogData: '',
+                loadingText: '暂无数据'
+            }
+        },
+        mounted() {
+            this.getwxaccounts();
+            this.getgroups();
+            this.getmembers();
+            this.getWxList();
+        },
+        methods: {
+            handleClick(tab, event) {
+                vm.activeTab = tab.$attrs['data-id'];
+                // console.log(vm.activeTab);
+                vm.getmemberId = '全部';
+                this.userId = '';
+                this.deptId = this.activeTab;
+                this.wxId == ''
+                vm.members = [];
+                this.getmembers();
+                this.getWxList();
+            },
+            getWxList() {
+                let _this = this;
+                _this.loadingText = '数据加载中....';
+                // if(_this.wxId == ''){
+                //     _this.deptId = 12;
+                // }
+                _this.wxData = [];
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": 1,
+                        "limit": 1000,
+                        "deptId": this.deptId,
+                        "userId": this.userId,
+                        "wxId": this.wxId,
+                    },
+                    url: "" + baseURL + "sys/user/list",
+                    success: function (json) {
+                        // console.log(json);
+                        _this.wxData = json.page.list;
+                        console.log(_this.wxData);
+                        _this.loadingText = '暂无数据'
+                    },
+                    error: function () {
+                        _this.loadingText = '暂无数据'
+                    }
+                });
+
+            },
+
+            getgroups() {
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": 1,
+                        "limit": 1000,
+                    },
+                    url: "" + baseURL + "sys/dept/queryAllSellerDepts",
+                    success: function (json) {
+                        // console.log(json);
+                        vm.activeName = json.body[0].name;
+                        vm.activeId = json.body[0].deptId;
+                        vm.groups = json.body;
+                        // console.log(vm.groups);
+                    }
+                });
+            },
+            getmembers() {
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": 1,
+                        "limit": 1000,
+                        // "onlyStaff": true,
+                        "deptId": this.activeTab,
+                    },
+                    url: "" + baseURL + "sys/user/getUserListByDept",
+                    success: function (json) {
+                        vm.members = json.body.list;
+                    }
+                });
+            },
+            getwxaccounts() {
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": 1,
+                        "limit": 1000,
+                        // "isMy": true
+                    },
+                    url: "" + baseURL + "sys/basedata/wxManager/list",
+                    success: function (json) {
+                        // console.log(json)
+                        vm.wxaccounts = json.body.list;
+                    }
+                });
+            },
+            changeWx(val) {
+                this.disabledOnOff = true;
+                if (this.wx == '') {
+                    this.disabledOnOff = false;
+                    this.deptId = 12;
+                } else {
+                    this.deptId = '';
+                }
+                this.userId = '';
+                this.getmemberId = '全部'
+                this.getgroups();
+                // console.log(val);
+                this.wxId = val;
+                this.getWxList();
+            },
+            changeUser(val) {
+                this.userId = val;
+                this.getWxList();
+            },
+            checkWxInfo(val) {
+                this.WxDialogData = val;
+                console.log(this.WxDialogData);
+                this.dialogVisible = true;
+            },
+            checkSchoolInfo(val) {
+                this.SchoolDialogData = val;
+                console.log(val);
+                this.dialogVisible1 = true;
+            }
+        }
+    });
+</script>
+</body>
+
+</html>
+
+</html>

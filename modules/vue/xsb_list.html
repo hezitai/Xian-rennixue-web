@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="订单号"
+            width="140">
+            <template slot-scope="scope">
+              <span>{{ scope.row.studCourse.orderNo }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+              label="学生姓名"
+              width="80">
+              <template slot-scope="scope">
+                <span>{{ scope.row.studCourse.callName }}</span>
+              </template>
+           </el-table-column>
+           <el-table-column
+           label="课程名称"
+           width="140">
+           <template slot-scope="scope">
+             <span>{{ scope.row.studCourse.temCourseName }}</span>
+           </template>
+          </el-table-column>
+          <el-table-column
+          label="下单时间"
+          width="160">
+          <template slot-scope="scope">
+            <span>{{ scope.row.studCourse.createAt }}</span>
+          </template>
+         </el-table-column>
+           <el-table-column 
+            label="课程状态"
+            width="160">
+            <template slot-scope="scope">
+                <span v-if='scope.row.studCourse.statused===1024'>已结课</span>
+                <span v-if='scope.row.studCourse.statused===2048'>已强制结课</span>
+                <span v-if='scope.row.studCourse.statused===4096'>已取消</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="操作">  
+                <template slot-scope="scope">  
+                <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)">上传文件</el-button>
+                <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button>      
+                </template>  
+            </el-table-column> 
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+            :visible.sync="dialogFormVisible2"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="课件名称" prop="name">
+                  <el-input v-model="ruleForm.name"></el-input>
+                </el-form-item>
+                <el-form-item label="分组名称" prop="course">
+                  <el-select v-model="ruleForm.course" placeholder="请选择" @change="change_course">
+                    <el-option
+                      v-for="item in courses"
+                      :key="item.id"
+                      :label="item.groupName"
+                      :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="课件">
+                    <input type="file" id="img_upload">
+                </el-form-item>
+
+              </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      dialogFormVisible:false,
+      dialogFormVisible2:false,
+      idss:[],
+      operaterOrderStatusedArr:null,
+      spoTypeArr:null,
+      sooTypeedArr:null,
+      sooStatusedArr:null,
+      selects:'',
+      countryId:'',
+      country:'',
+      key:'',
+      id:'',
+      val:1,
+      courses:'',
+      page:"",
+      name:'',
+      course:'',
+      ruleForm: {
+        course:'',
+        },
+        rules: {
+          country: [
+            { required: true, message: '请选择委派教师', trigger: 'change' }
+          ]
+        }
+      }
+ },
+
+ mounted() {
+  this.getTableData(); 
+  // this.getdata();
+  this.coursedata();
+ },
+ methods: {
+  seedetail(row,index){
+    localStorage.setItem("did", row.courseId);
+    window.open( "seller_detail.html?id="+row.courseId+"");
+  },  
+  // getdata(){
+  //   var self = this;  
+  //   axios.get(""+baseURL+"/sys/oper/getOperatorOrder",{
+  //   params:{
+  //     "token": token,
+  //     "page": this.val,
+  //     "limit": 6 ,
+  //     "statused" : 1
+  //   }
+  //   })
+  //   .then(function(response){
+  //     self.tableDataEnd = response.data.body.list; 
+  //     self.total = response.data.body.totalCount;
+  //     self.pageSize = response.data.body.totalCount;
+  //     self.currentPage = response.data.body.currPage;
+  //   })
+  //   .catch(function(err){
+  //     console.log(err);
+  //   });
+  // },
+
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": 6 ,
+            "statused" : 208,
+            "onlyMe" : true
+            // "operaterOrderStatusedArr":this.operaterOrderStatusedArr,
+            // "spoTypeArr":this.spoTypeArr,
+            // "sooTypeedArr":this.sooTypeedArr,
+            // "sooStatusedArr":this.sooStatusedArr,
+          } ,
+          url : ""+baseURL+"/sys/seller/order/list",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }
+      });    
+      },
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+
+dialogVisible(row,_index){
+  vm.id = row.courseId;
+  this.dialogFormVisible2=true;
+},
+coursedata(){
+    $.ajax({
+        type: "get",
+        url: ""+baseURL+"sys/seller/courseware/groupList",
+        dataType: "json", 
+        data: {
+          "token": token,
+          "page": 1,
+          "limit": 1000
+          },
+          success: function(r){
+            vm.courses = r.body.list;
+        }
+    });
+  },
+ handleCurrentChange(val) {
+  vm.val = val;
+  this.getTableData(); 
+ },
+ change_course(courseid){
+  vm.courseid = courseid;
+ },
+  submitForm2(formName) {
+    var self = this;
+    this.$refs[formName].validate((valid) => {
+          if (valid) {
+            var file=$("#img_upload")[0].files[0];
+            if(file==null)
+                return;
+            var name = this.$refs.ruleForm.model.name;    
+            var course = this.$refs.ruleForm.model.course; 
+            var formData=new FormData();
+            formData.append('file',file);
+            formData.append('name',name);
+            formData.append('cdId',vm.id);
+            formData.append('groupId',vm.courseid);
+            var token = localStorage.getItem("token");
+            $.ajax({
+              headers: {"token": token},
+                url:""+baseURL+"sys/seller/courseware/save",
+                type:'POST',
+                processData: false,
+                contentType: false,
+                data:formData,
+                mimeType: "multipart/form-data",
+                success: function(r){
+                  r = JSON.parse(r);
+                  status  = r.status;
+                  if(status == 200){
+                    vm.$message({
+                    message: '上传课件成功',
+                    type: 'success'
+                  });
+                  vm.dialogFormVisible2 = false;
+                  setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+                  }
+                  if(status == 400){
+                    vm.$message({
+                    message: r.body.msg,
+                    type: 'warning'
+                  });
+                  vm.dialogFormVisible2 = false;
+                  setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+                  }
+              }
+            });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+
+      },      
+
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+        let ids = [];
+        this.multipleSelection.map((item)=> {
+          var id = item.id;
+        ids.push(""+id+"");
+        });
+        this.selectedIDs = ids;
+        console.log('多选',ids);
+        this.idss =  this.selectedIDs;
+        console.log(this.idss);
+      }, 
+   
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary">搜索</el-button>
+        <el-table 
+        :data="tableDataEnd"
+        ref="multipleTable"
+        border
+        style="width: 100%;margin-top:5px;"
+        @selection-change="handleSelectionChange">
+        <el-table-column
+        label="下单时间"
+        width="160">
+        <template slot-scope="scope">
+          <span>{{ scope.row.createAt }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column
+          label="销售"
+          width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.sellerName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+        label="异常类型"
+        width="200">
+        <template slot-scope="scope">
+          <span v-if='scope.row.exceptionType===1'>价格不符</span>
+          <span v-if='scope.row.exceptionType===2'>师资资源</span>
+          <span v-if='scope.row.exceptionType===3'>客户意向不足</span>
+          <span v-if='scope.row.exceptionType===4'>其他</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        label="详情"
+        width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.description }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column 
+          label="处理状态"
+          width="80">
+          <template slot-scope="scope">
+          <span v-if='scope.row.statused===32'>未处理</span>
+          <span v-if='scope.row.statused!==32'>已处理</span>
+        </template>
+        </el-table-column>
+        <el-table-column label="操作">  
+            <template slot-scope="scope">  
+            <el-button size="mini" disabled v-if="scope.row.statused !== 32">确认状态</el-button> 
+            <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)" v-if="scope.row.statused === 32">确认状态</el-button>   
+            <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button> 
+            </template>  
+        </el-table-column> 
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog
+        :visible.sync="dialogFormVisible2"
+        width="40%">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+            <el-form-item label="状态类型" prop="type">
+            <el-form-item>
+              <el-select placeholder="" v-model="ruleForm.type" @change="changetype">
+                  <el-option label="同意订单作废" value="1"></el-option>
+                  <el-option label="同意订单进入公共订单池" value="2"></el-option>
+                  <el-option label="驳回坏单申请" value="3"></el-option>
+                  <el-option label="重新分配给新的销售" value="4"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form-item>
+          <el-form-item label="销售姓名" prop="name" v-show="!nameshow">
+              <el-form-item>
+                <el-select placeholder="" v-model="ruleForm.name">
+                    <el-option
+                    v-for="item in names"
+                    :key="item.id"
+                    :label="item.username"
+                    :value="item.userId">
+                    </el-option>
+                </el-select>
+              </el-form-item>
+            </el-form-item>
+          </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" v-bind:loading="btnstatus" @click="save('ruleForm')">{{btnval}}</el-button>
+        </span>
+      </el-dialog>
+        <el-pagination
+        style="margin-top:15px"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[6]"
+          :page-size="6"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+    </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript"> 
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      btnstatus:false,
+      btnval:"确 定",
+      names:'',  
+      nameshow:true,  
+      dialogFormVisible2:false,  
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      idss:[],
+      data:'',
+      id:'',
+      value:'',
+      ruleForm: {
+        },
+        rules: {
+          type: [
+            { required: true, message: '请选择坏单类型', trigger: 'change' }
+          ]
+        }
+      }
+ },
+ multipleSelection: [],
+ mounted() {
+  this.getTableData(); 
+ if (this.totalItems > this.pageSize) {
+  for (let index = 0; index < this.pageSize; index++) {
+  this.tableDataEnd.push(this.tableDataBegin[index]);
+  }
+ } else {
+  this.tableDataEnd = this.tableDataBegin;
+ }
+ },
+ methods: {
+  choosedata:function(value){
+    console.log(value);
+    this.value = value;
+  },  
+  seedetail(row,index){
+    localStorage.setItem("did", row.courseId);
+    window.open( "seller_detail.html?id="+row.courseId+"");
+  }, 
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": 1,
+            "limit": 6 ,
+            "exceptionType":""
+          } ,
+          url : ""+baseURL+"sys/seller/order/abnormalList",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }  
+      });    
+      },
+ openData() {this.getTableData();},
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+ changetype(val){
+  vm.val = val; 
+  if(val == 4){
+    vm.nameshow = false;
+  }else{
+    vm.nameshow = true;
+  }
+ },
+ getnames(row,_index){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "notIncludeUserId":vm.sellerId
+    } ,
+    url : ""+baseURL+"/sys/user/getMyDeptUserList",  
+    success : function(json) {  
+      vm.names = json.body.list; 
+    }
+});
+
+},
+ handleCurrentChange(val) {
+  console.log(`当前页: ${val}`);
+  this.currentPage = val;
+  this.page =  this.currentPage;
+  const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": val,
+            "limit": 6 ,
+            "exceptionType":""
+          } ,
+          url : ""+baseURL+"sys/seller/order/abnormalList",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }  
+      });
+ },
+ save(formName) {
+  let _this = this;
+  var datas = _this.ruleForm;
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+        vm.btnstatus=true;
+        vm.btnval="加载中";
+      $.ajax({  
+        type : "post",  
+        dataType : "json", 
+        cache: false, 
+        contentType: "application/json",
+        headers: {"token": token},
+        data:JSON.stringify({
+          "ids" : [vm.id],
+          "flag" : Number(vm.val),
+          "newSellerId":this.$refs.ruleForm.model.name,
+        }),
+        url : ""+baseURL+"sys/seller/order/reviewBadOrder",  
+        success : function(json) {  
+          if(json.status == "200"){
+            vm.$message({
+            message: json.body.msg,
+            type: 'success'
+          });
+          vm.btnstatus=false;
+          vm.btnval="确 定";
+          vm.dialogFormVisible2=false;
+          vm.getTableData();
+          }
+          if(json.status == "400"){
+            vm.$message({
+            message: json.body.msg,
+            type: 'warning'
+          });
+          vm.btnstatus=false;
+          vm.btnval="确 定";
+          vm.dialogFormVisible2=false;
+          vm.getTableData();
+          }
+        } 
+    });
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
+  }, 
+ dialogVisible(row,index){
+  vm.dialogFormVisible2 = true;
+     vm.id = row.id;
+     vm.sellerId = row.sellerId;
+     vm.getnames();
+ },   
+  handleSelectionChange(val) {
+    this.multipleSelection = val;
+    let ids = [];
+    this.multipleSelection.map((item)=> {
+      var id = item.id;
+    ids.push(""+id+"");
+    });
+    this.selectedIDs = ids;
+    console.log('多选',ids);
+    this.idss =  this.selectedIDs;
+    console.log(this.idss);
+  },   
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

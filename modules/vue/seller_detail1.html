@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    .demo-ruleForm{
+      width: 100%;
+    }
+    .demo-ruleForm .el-form-item{
+      width: 33%;
+      float:left;
+    }
+    .clears:after {
+    display: block;
+    clear: both;
+    content: "";
+    visibility: hidden;
+    height: 0
+}
+  </style>
+</head>
+<body>
+    <div id="app">
+        <p>订单信息</p>
+        <el-form :model="ruleForm1" ref="ruleForm1" label-width="100px" class="demo-ruleForm clears">
+          <el-form-item label="订单号" prop="orderNo">
+            <el-input v-model="ruleForm1.orderNo" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="预计课时" prop="scheduledTime">
+            <el-input v-model="ruleForm1.scheduledTime" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="实际课时" prop="allSchooltime">
+            <el-input v-model="ruleForm1.allSchooltime" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="订单费用" prop="totalPrice">
+            <el-input v-model="ruleForm1.totalPrice" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="课程预付" prop="prepayment">
+            <el-input v-model="ruleForm1.prepayment" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="订单状态" prop="statused">
+            <el-input v-model="ruleForm1.statused" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="负责客服" prop="username">
+            <el-input v-model="ruleForm1.username" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="负责师资" prop="nickname">
+            <el-input v-model="ruleForm1.nickname" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="辅导讲师" prop="nickname1">
+            <el-input v-model="ruleForm1.nickname1" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="师资费用" prop="teacFixedPrice">
+            <el-input v-model="ruleForm1.teacFixedPrice" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="讲师已获(G)" prop="prices2">
+            <el-input v-model="ruleForm1.prices1" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="讲师已获(OTG)" prop="prices2">
+            <el-input v-model="ruleForm1.prices2" :disabled="true"></el-input>
+          </el-form-item>
+        </el-form>
+        <p>课程信息</p>
+        <el-form :model="ruleForm2" ref="ruleForm2" label-width="100px" class="demo-ruleForm clears">
+            <el-form-item label="课程名称" prop="courseName">
+              <el-input v-model="ruleForm2.courseName" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="课程代码" prop="courseCode">
+              <el-input v-model="ruleForm2.courseCode" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="课程类型" prop="type">
+              <el-input v-model="ruleForm2.type" :disabled="true"></el-input>
+            </el-form-item>
+          </el-form>
+        <p>课件信息</p>
+        <el-table 
+        :data="studCoursewareList"
+        border
+        style="width: 100%;margin-top:5px;"
+        @selection-change="">
+        <el-table-column
+          label="课件名称"
+          width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+        label="课件组"
+        width="240">
+        <template slot-scope="scope">
+          <span>{{ scope.row.groupName }}</span>
+          </template>
+        </el-table-column>
+        </el-table>
+        <p>学生信息</p>
+        <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm clears">
+            <el-form-item label="姓名" prop="nickname">
+              <el-input v-model="ruleForm.nickname" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="学校名称" prop="schoolName">
+              <el-input v-model="ruleForm.schoolName" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="专业" prop="temCourseName">
+              <el-input v-model="ruleForm.temCourseName" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="学历" prop="levelName">
+              <el-input v-model="ruleForm.levelName" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="学年" prop="schoolYear">
+              <el-input v-model="ruleForm.schoolYear" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="期望节课时间" prop="endCourseTime">
+              <el-input v-model="ruleForm.endCourseTime" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="考试时间" prop="examTime">
+              <el-input v-model="ruleForm.examTime" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="学校系统账号" prop="schoolAccount">
+              <el-input v-model="ruleForm.schoolAccount" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="学校系统密码" prop="schoolPws">
+              <el-input v-model="ruleForm.schoolPws" :disabled="true"></el-input>
+            </el-form-item>
+          </el-form>
+        <p>课堂信息</p>
+        <el-table 
+        :data="classroomdata"
+        border
+        style="width: 100%;margin-top:5px;"
+        @selection-change="">
+        <el-table-column
+          label="课堂名称"
+          width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+        label="课堂说明"
+        width="240">
+        <template slot-scope="scope">
+          <span>{{ scope.row.description }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column
+        label="开始时间"
+        width="180">
+        <template slot-scope="scope">
+          <span>{{ scope.row.startTime }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        label="结束时间"
+        width="180">
+        <template slot-scope="scope">
+          <span>{{ scope.row.endTime  }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column 
+          label="时长"
+          width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.schooltime  }}分</span>
+        </template>
+        </el-table-column>
+      <el-table-column 
+      label="评分"
+      width="80">
+      <template slot-scope="scope">
+      <span>{{ scope.row.rate }}</span>
+    </template>
+    </el-table-column>
+        </el-table>
+    </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        id:'',
+        classroomdata: [],
+        studCoursewareList:[],
+        ruleForm: {
+
+        },
+        ruleForm1:{
+          nickname:'',
+        },
+        ruleForm2:{
+          courseCode:'',
+          courseName:'',
+          type:'',
+        }
+      }
+ },
+ mounted() {
+  this.getclassroomdata(); 
+ },
+ methods: {
+  getclassroomdata:function(){  
+    getUrlStr =  function(name) {
+　　var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+　　var r = window.location.search.substr(1).match(reg);
+　　if(r != null) return unescape(r[2]);
+　　return null;
+};
+var id = getUrlStr ("id");
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": 1,
+            "limit": 6 ,
+            "exceptionType":""
+          } ,
+          url : ""+baseURL+"sys/oper/getCourseObject?id="+id+"",  
+          success : function(json) {  
+           vm.classroomdata = json.body.classroomList; 
+           vm.studCoursewareList = json.body.studCoursewareList; 
+           vm.studdate = json.body.studUser;  
+           vm.ruleForm1.orderNo = json.body.orderNo;
+           vm.ruleForm1.scheduledTime = json.body.studPurchaseOrder.scheduledTime;
+           vm.ruleForm1.allSchooltime = json.body.allSchooltime;
+           vm.ruleForm1.totalPrice = json.body.studPurchaseOrder.currency;
+           vm.ruleForm1.prepayment = json.body.studPurchaseOrder.currency;
+           vm.ruleForm1.prices1 = Number(json.body.teacG)+Number(json.body.teacG);
+           vm.ruleForm1.prices2 = Number(json.body.teacOtg)+Number(json.body.teacPreOtg);
+           if(json.body.statused == 1){
+            vm.ruleForm1.statused = "未处理（无任何销售接单）"
+           }
+           if(json.body.statused == 2){
+            vm.ruleForm1.statused = "待审核"
+           }
+           if(json.body.statused == 4){
+            vm.ruleForm1.statused = "待确定"
+           }
+           if(json.body.statused == 8){
+            vm.ruleForm1.statused = "待规划（等待教师/运营接单）"
+           }
+           if(json.body.statused == 16){
+            vm.ruleForm1.statused = "规划中(订单第一次超时等待运营接单)"
+           }
+           if(json.body.statused == 32){
+            vm.ruleForm1.statused = "规划中(订单第二次超时等待运营主管强制指派)"
+           }
+           if(json.body.statused == 64){
+            vm.ruleForm1.statused = "规划中(运营接单待指派，正在处理)"
+           }
+           if(json.body.statused == 128){
+            vm.ruleForm1.statused = "待排课"
+           }
+           if(json.body.statused == 256){
+            vm.ruleForm1.statused = "已排课"
+           }
+           if(json.body.statused == 512){
+            vm.ruleForm1.statused = "申请结课中"
+           }
+           if(json.body.statused == 1024){
+            vm.ruleForm1.statused = "已结课"
+           }
+           if(json.body.statused == 2048){
+            vm.ruleForm1.statused = "已强制结课"
+           }
+           if(json.body.statused == 4096){
+            vm.ruleForm1.statused = "已取消"
+           }
+           if(json.body.statused == 8192){
+            vm.ruleForm1.statused = "坏单申请中"
+           }
+           if(json.body.statused == 16384){
+            vm.ruleForm1.statused = "订单作废"
+           }
+           if(json.body.statused == 32768){
+            vm.ruleForm1.statused = "销售被更换"
+           }
+           vm.ruleForm1.username = json.body.sysSeller.username;
+           vm.ruleForm1.nickname = json.body.sysUserEntity.username;
+           vm.ruleForm1.nickname1 = json.body.teacUser.nickName; 
+           vm.ruleForm1.teacFixedPrice = json.body.teacFixedPrice; 
+
+           vm.ruleForm2.courseName = json.body.studPurchaseOrder.courseName; 
+           vm.ruleForm2.courseCode = json.body.studPurchaseOrder.courseCode; 
+           if(json.body.studPurchaseOrder.type == 0){
+            vm.ruleForm2.type = "定制辅导" 
+           }
+           if(json.body.studPurchaseOrder.type == 1){
+            vm.ruleForm2.type = "考前突击" 
+           }
+           if(json.body.studPurchaseOrder.type == 2){
+            vm.ruleForm2.type = "包课辅导" 
+           }
+           if(json.body.studPurchaseOrder.type == 4){
+            vm.ruleForm2.type = "论文辅导" 
+           }
+           if(json.body.studPurchaseOrder.type == 32){
+            vm.ruleForm2.type = "特殊订单" 
+           }
+
+           vm.ruleForm.nickname = json.body.studUser.nickName;
+           vm.ruleForm.schoolName = json.body.sysUniversity.name;
+           vm.ruleForm.temCourseName = json.body.sysProfessionalCourses.chineseName;
+           vm.ruleForm.levelName = json.body.studUser.eduName;
+           vm.ruleForm.schoolYear = json.body.studPurchaseOrder.schoolYear;
+           vm.ruleForm.endCourseTime = json.body.studPurchaseOrder.endCourseTime;
+           vm.ruleForm.examTime = json.body.studPurchaseOrder.examTime;
+           vm.ruleForm.schoolAccount = json.body.studPurchaseOrder.schoolAccount;
+           vm.ruleForm.schoolPws = json.body.studPurchaseOrder.schoolPws;
+           loading.close();
+         } 
+      });    
+      },
+ }
+});
+  </script> 
+</body>  
+</html>  
+</html>

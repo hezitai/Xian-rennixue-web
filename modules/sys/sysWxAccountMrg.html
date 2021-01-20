@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>微信号列表</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../plugins/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="../../plugins/toastr/toastr.css">
+    <link rel="stylesheet" href="../vue/css/index.css">
+
+    <script src="../../libs/jquery.min.js"></script>
+    <script src="../../plugins/layer/layer.js"></script>
+    <script src="../../libs/bootstrap.min.js"></script>
+    <script src="../../libs/vue.min.js"></script>
+    <script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+    <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+    <script src="../../js/common.js"></script>
+    <script src="../../plugins/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+    <script src="../../plugins/toastr/toastr.js"></script>
+    <script src="../vue/js/index.js"></script>
+
+</head>
+<style>
+    th {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+</style>
+
+<body>
+    <div id="rrapp" v-cloak>
+        <div v-show="showList">
+            <div class="grid-btn">
+                <div class="form-group col-sm-2">
+                    <input type="text" class="form-control" v-model="q.username" @change="query" @keyup.enter="query"
+                        placeholder="请输入微信账号、微信昵称...">
+                </div>
+                <select style="height:35px;line-height:35px;border:1px solid #ddd;border-radius:4px;width:100px"
+                    @change="change" id="select">
+                    <option value="">全部</option>
+                    <option value="1">备用号</option>
+                    <option value="2">使用中</option>
+                    <option value="4">已交付</option>
+                </select>
+                <a class="btn btn-primary" @click="query"><i class="glyphicon glyphicon-search"></i>&nbsp;查询</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:add')" @click="add"><i
+                        class="fa fa-plus"></i>&nbsp;新增</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:modify')" @click="update"><i
+                        class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+                <a class="btn btn-primary delclass" v-if="hasPermission('sys:wxManage:delete')" @click="del"><i
+                        class="fa fa-trash-o"></i>&nbsp;删除</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:delivery')" @click="returned"><i
+                        class="glyphicon glyphicon-share-alt"></i>&nbsp;交付</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:bind')" @click="showBind"><i
+                        class="glyphicon glyphicon-ok"></i>&nbsp;绑定</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:unbind')" @click="showUnBind"><i
+                        class="glyphicon glyphicon-remove"></i>&nbsp;解绑</a>
+                <a class="btn btn-primary" v-if="hasPermission('sys:wxManage:bindSchool')" @click="showSchoolBind"><i
+                        class="glyphicon glyphicon-ok"></i>&nbsp;绑定学校</a>
+                <!-- <a class="btn btn-primary" @click="showFacilityBind"><i class="glyphicon glyphicon-ok"></i>&nbsp;绑定设备</a>
+                <a class="btn btn-primary" @click="showSchoolUnBind"><i class="glyphicon glyphicon-remove"></i>&nbsp;解绑学校</a>
+                <a class="btn btn-primary" @click="showFacilityUnBind"><i class="glyphicon glyphicon-remove"></i>&nbsp;解绑设备</a> -->
+            </div>
+            <table id="jqGrid"></table>
+            <div id="jqGridPager"></div>
+        </div>
+        <el-dialog title="提示" :visible.sync="xiugaihaoyou" width="40%" :before-close="xiugaihaoyouhandleClose">
+            <span>请输入好友数</span><el-input type='number' v-model="haoyoushu"></el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="xiugaihaoyouhandleClose">取 消</el-button>
+                <el-button type="primary" @click="xiugaihaoyouSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <div v-show="!showList" class="panel panel-default">
+            <div class="panel-heading">{{title}}</div>
+            <form class="form-horizontal" style="padding-left: 30px;">
+                <h4>基本信息</h4>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">微信账号</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control manager" v-model="wxAccount.wxAccount"
+                            placeholder="微信账号" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">微信密码</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" v-model="wxAccount.wxPassword" placeholder="微信密码" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">微信昵称</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" v-model="wxAccount.wxName" placeholder="微信昵称" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">微信创建人</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control manager" v-model="wxAccount.signinUser"
+                            placeholder="微信创建人" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">建号时间</div>
+                    <div class="col-sm-10">
+                        <input type="text" id="signupTime" v-model="wxAccount.signupTime" autocomplete="off"
+                            class="form-control mydatetime manager" placeholder="建号时间" @click="setDateTime" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">当前好友数</div>
+                    <div class="col-sm-10">
+                        <input type="number"
+                            onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                            onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                            class="form-control manager" v-model="wxAccount.friendNum" placeholder="当前数据量" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">当前系统有效数据</div>
+                    <div class="col-sm-10">
+                        <input type="number"
+                            onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                            onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                            class="form-control manager" v-model="wxAccount.reaFriendNum" placeholder="目前有效数据" />
+                    </div>
+                </div>
+                <div class="form-group" v-show="wxAccount.id != null">
+                    <div class="col-sm-2 control-label">状态</div>
+                    <label class="radio-inline">
+                        <input type="radio" disabled="true" name="statused" value="1" v-model="wxAccount.statused" />
+                        备用号
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" disabled="true" name="statused" value="2" v-model="wxAccount.statused" />
+                        使用中
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" disabled="true" name="statused" value="4" v-model="wxAccount.statused" />
+                        已交付
+                    </label>
+                </div>
+                <div class="form-group" v-if="wxAccount.statused == 2 && wxAccount.id != null">
+                    <div class="col-sm-2 control-label">使用人</div>
+                    <div class="col-sm-10">
+                        <input type="text" disabled="true" class="form-control manager" v-model="wxAccount.operatorName"
+                            placeholder="使用人" />
+                    </div>
+                </div>
+                <div class="form-group" v-show="wxAccount.statused == 4">
+                    <div class="col-sm-2 control-label">交付原因</div>
+                    <div class="col-sm-10">
+                        <select disabled="true" class="form-control manager" id="reasonId1" @change="reasonChange">
+                            <option v-for="reason in reasons" :value="reason.id"> {{reason.exceptionName}} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" v-show="wxAccount.statused == 4">
+                    <div class="col-sm-2 control-label">交付时间</div>
+                    <div class="col-sm-10">
+                        <input type="text" disabled="true" class="form-control mydatetime manager"
+                            v-model="wxAccount.deliveryTime" placeholder="交付时间" />
+                    </div>
+                </div>
+                <hr />
+                <h4>高级信息</h4>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">实名认证人</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control manager" v-model="wxAccount.certificationUser"
+                            placeholder="实名认证人" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">绑定手机号</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control manager" v-model="wxAccount.bindPhone"
+                            placeholder="绑定手机号" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">支付密码</div>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control manager" v-model="wxAccount.payPassword"
+                            placeholder="支付密码" />
+                    </div>
+                </div>
+                <div>
+                    <p style="text-indent: 10px; display: inline-block;margin-right: 10px;">紧急联系人：</p>
+                    <input style="display: inline-block" type="button" class="btn btn-primary btn-xs"
+                        @click="addEmergency" value="新增紧急联系人" />
+                </div>
+                <div v-for="(item, index) in wxAccount.wxEmergencyContacts">
+                    <div>
+                        <!-- <div class="form-group" style="position:relative;">
+                            <div class="col-sm-2 control-label">微信昵称</div>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control manager" v-model="item.userName" placeholder="微信昵称" />
+                            </div>
+                            
+                        </div> -->
+                        <div class="form-group" style="position:relative;">
+                            <div class="col-sm-2 control-label">微信ID</div>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control manager" v-model="item.userPhone"
+                                    placeholder="微信ID" />
+                            </div>
+                            <input type="button" style="margin-top:5px; position:absolute;right: -25px;top: -5px;"
+                                class="btn btn-danger" @click="delEmergency(item)" value="删除" />
+                        </div>
+                    </div>
+                    <hr />
+                </div>
+
+
+                <!-- <el-form-item v-for="(domain, index) in dynamicValidateForm.domains" :label="'域名' + index" :key="domain.key"
+                    :prop="'domains.' + index + '.value'" :rules="{required: true, message: '域名不能为空', trigger: 'blur'}">
+                    <el-input v-model="domain.value"></el-input>
+                    <el-button @click.prevent="removeDomain(domain)">删除</el-button>
+                </el-form-item> -->
+
+                <div class="form-group">
+                    <div class="col-sm-2 control-label"></div>
+                    <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定" />
+                    &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回" />
+                </div>
+            </form>
+        </div>
+
+        <!-- 模态框 -->
+        <div class="modal fade" id="returnedModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">交付账号</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label">交付原因</div>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="reasonId" @change="reasonChange">
+                                    <option v-for="reason in reasons" :value="reason.id"> {{reason.exceptionName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doreturn" class="btn btn-primary" id="deleteHaulBtn">确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 -->
+        <div class="modal fade" id="bindModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">绑定账号</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label" id="reason">使用人</div>
+                            <div class="col-sm-10">
+                                <!-- <select class="form-control" id="userId" @change="userChange">
+                                <option v-for = "user in userList" :value="user.userId"> {{user.username}} </option>
+                            </select> -->
+                                <el-select v-model="value" filterable placeholder="请选择" @change="userChange">
+                                    <el-option v-for="item in userList" :key="item.userId" :label="item.username"
+                                        :value="item.userId">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doBind" class="btn btn-primary">确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 绑定学校-->
+        <div class="modal fade" id="bindSchoolModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">绑定账号</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label" id="reason" style="line-height: 44px;">选择学校</div>
+                            <div class="col-lg-5">
+                                <el-select v-model="countryId" filterable placeholder="请选择国家" @change="change_country"
+                                    style="margin-left:10px;">
+                                    <el-option label="全部" value=""></el-option>
+                                    <el-option v-for="item in country" :key="item.id" :label="item.name"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="col-lg-5">
+                                <el-select v-model="universityId" filterable placeholder="请选择学校"
+                                    @change="change_university">
+                                    <el-option label="全部" value=""></el-option>
+                                    <el-option v-for="item in university" :key="item.id" :label="item.name"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doBindSchool" class="btn btn-primary">确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 绑定设备-->
+        <div class="modal fade" id="bindFacilityModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">绑定设备</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-lg-4 control-label" id="reason" style="line-height: 44px;">选择绑定的设备</div>
+                            <div class="col-lg-8">
+                                <el-select v-model="devicesId" filterable placeholder="请选择" @change=""
+                                    style="margin-left:10px;">
+                                    <el-option label="全部" value=""></el-option>
+                                    <el-option v-for="item in devices" :key="item.id" :label="item.deviceName"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doBindFacility" class="btn btn-primary">确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 解绑学校-->
+        <div class="modal fade" id="unBindSchoolModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">查看</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- <el-table :data="" border style="width: 100%;margin-top:5px;">
+                            <el-table-column width="150" property="date" label="日期"></el-table-column>
+                            <el-table-column width="100" property="name" label="姓名"></el-table-column>
+                            <el-table-column width="300" property="address" label="地址"></el-table-column>
+                        </el-table> -->
+
+                        <!-- <ul class="bind-school-list">
+                            <li>
+                                <span>国家</span>
+                                <span>学校</span>
+                                <span>所属微信号</span>
+                                <span>系统有效数据</span>
+                                <span>操作</span>
+                            </li>
+                        </ul> -->
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>国家</th>
+                                    <th>学校</th>
+                                    <th>所属微信号</th>
+                                    <!-- <th>系统有效数据</th> -->
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in getBindSchoolWxList">
+                                    <td>{{item.countryName}}</td>
+                                    <td>{{item.name}}</td>
+                                    <td>{{item.sysWxAccountName}}</td>
+                                    <!-- <td>200</td> -->
+                                    <td><button type="button" v-if='changeBindSchoolButton == true'
+                                            @click="delBindWxToSchool(item)" class="btn btn-warning">删除</button><button
+                                            type="button" v-if='changeBindSchoolButton == false' disabled
+                                            class="btn btn-warning">删除</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doUnBindSchool" class="btn btn-primary">确认
+                        </button>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 解绑设备-->
+        <div class="modal fade" id="unBindFacilityModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <h4 class="modal-title">解绑设备</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-lg-4 control-label" id="reason" style="line-height: 44px;">选择解绑的设备</div>
+                            <div class="col-lg-8">
+                                <el-select v-model="devicesId" filterable placeholder="请选择" @change=""
+                                    style="margin-left:10px;">
+                                    <el-option label="全部" value=""></el-option>
+                                    <el-option v-for="item in devices" :key="item.id" :label="item.deviceName"
+                                        :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                        <p>&nbsp;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">取消
+                        </button>
+                        <button type="button" @click="doUnBindFacility" class="btn btn-primary">确认
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- bindFacilityModal -->
+    <script src="../../js/modules/sys/sysWxAccountMrg.js"></script>
+</body>
+
+</html>

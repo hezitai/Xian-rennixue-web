@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+            <el-button type="primary" @click="search">搜索</el-button>
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="订单号"
+            width="140">
+            <template slot-scope="scope">
+              <span>{{ scope.row.orderNo }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+              label="姓名"
+              width="120">
+              <template slot-scope="scope">
+                <span>{{ scope.row.callName }}</span>
+              </template>
+           </el-table-column>
+            <el-table-column 
+            label="学校名称"
+            width="120">
+            <template slot-scope="scope">
+             <span>{{ scope.row.schoolName }}</span>
+           </template>
+           </el-table-column>
+           <el-table-column 
+            label="专业名称"
+            width="120">
+            <template slot-scope="scope">
+              <span>{{ scope.row.professionalName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="课程名称"
+            width="120">
+            <template slot-scope="scope">
+              <span>{{ scope.row.temCourseName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="订单类型"
+            width="80">
+            <template slot-scope="scope">
+                <span v-if='scope.row.spoType===0'>定制辅导</span>
+                <span v-if='scope.row.spoType===1'>考前突击</span>
+                <span v-if='scope.row.spoType===2'>包课辅导 </span>
+                <span v-if='scope.row.spoType===4'>论文辅导</span>
+                <span v-if='scope.row.spoType===32'>特殊订单</span> 
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="创建时间"
+            width="160">
+            <template slot-scope="scope">
+              <span>{{ scope.row.createAt }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="操作">  
+                <template slot-scope="scope">  
+                <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)">分配订单</el-button> 
+                <el-button size="mini" @click="see(scope.row,scope.$index)">查看详情</el-button> 
+                </template>  
+            </el-table-column> 
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+            :visible.sync="dialogFormVisible2"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="教师姓名" prop="country">
+                <el-form-item>
+                  <el-select placeholder="教师姓名" v-model="ruleForm.country" style="width: 200px;" @change="handleChange">
+                    <el-option
+                    v-for="item in selects"
+                    :key="item.id"
+                    :label="item.nickName"
+                    :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form-item>
+              <el-form-item label="G币" prop="price" v-show="gg">
+                  <el-input v-model="ruleForm.price"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        gg:true,
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      filterTableDataEnd:[],
+      dialogFormVisible:false,
+      dialogFormVisible2:false,
+      idss:[],
+      options:[],
+      selectedOptions: [],
+      selects:'',
+      countryId:'',
+      country:'',
+      key:'',
+      id:'',
+      page:"",
+      name:'',
+      ruleForm: {
+        },
+        rules: {
+          country: [
+            { required: true, message: '请选择教师姓名', trigger: 'change' }
+          ]
+        }
+      }
+ },
+
+ mounted() {
+  this.getTableData(); 
+ },
+ methods: {
+  search:function(){  
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": 1,
+            "limit": 6,
+            "id":vm.tableDataName 
+          } ,
+          url : ""+baseURL+"/sys/seller/order/getOrderPool/info",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      }, 
+  see(row,index){
+    window.open( "seller_detail1.html?id="+row.id+"");
+  },   
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": 1,
+            "limit": 6 
+          } ,
+          url : ""+baseURL+"/sys/oper/getOrderPool",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      },
+ openData() {this.getTableData();},
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+
+handleChange(item) {
+
+},
+
+dialogVisible(row,_index){
+  if(row.spoType == 0){
+    vm.gg = false;
+  }else{
+    vm.gg = true;
+  }
+  vm.id = row.id;
+  this.dialogFormVisible2=true;
+  var token = localStorage.getItem("token");
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 10 
+    } ,
+    url : ""+baseURL+"/sys/oper/teacList",  
+    success : function(json) {  
+      vm.selects = json.body.list; 
+    }
+});
+
+},
+ handleCurrentChange(val) {
+  console.log(`当前页: ${val}`);
+  this.currentPage = val;
+  this.page =  this.currentPage;
+  console.log(this.page);
+  const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": val,
+            "limit": 6 
+          } ,
+          url : ""+baseURL+"/sys/seller/order/getOrderPool",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         },  
+         error : function(json) {  
+ 
+        }  
+      });
+ },
+
+  submitForm2(formName) {
+    var self = this;
+    this.$refs[formName].validate((valid) => {
+          if (valid) {
+            console.log(this.ruleForm.country)
+            var token = localStorage.getItem("token");
+            $.ajax({  
+              type : "post",  
+              dataType: "json", 
+              headers: {"token": token},
+              data:{
+                teacId: this.ruleForm.country,
+                courseId:vm.id,
+                price:this.ruleForm.price
+              },
+              url : ""+baseURL+"/sys/oper/assignedOrder",  
+              success : function(json) {  
+                if(json.status == 200){
+                  vm.$message({
+                  message: '分配订单成功',
+                  type: 'success'
+                });
+                vm.dialogFormVisible2=false;
+                setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+                }
+                if(json.status == 400){
+                  vm.$message({
+                  message: json.body.msg,
+                  type: 'warning'
+                });
+                vm.dialogFormVisible2=false;
+                setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+                }
+              }
+          });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+
+      },      
+
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+        let ids = [];
+        this.multipleSelection.map((item)=> {
+          var id = item.id;
+        ids.push(""+id+"");
+        });
+        this.selectedIDs = ids;
+        console.log('多选',ids);
+        this.idss =  this.selectedIDs;
+        console.log(this.idss);
+      }, 
+   
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

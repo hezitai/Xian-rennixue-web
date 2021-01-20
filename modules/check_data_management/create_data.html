@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+  .demo-ruleForm{
+    width:50%;
+    margin: 0 auto;
+  }
+  .el-row {
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }
+  .actived{
+    background: #409EFF !important;
+    color: #fff;
+  }
+  .datas p{
+    float: left;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    list-style: none;
+    padding: 4px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    background: #ddd;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .span, .datas{
+    float: left;
+  }
+  .fl{
+    float: left;
+  }
+  .fldata{
+    margin-left: 10px;
+  }
+</style>
+<body>
+    <div id="app">
+
+    </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript"> 
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      ruleForm: {
+        },
+        rules: {
+          wxAccount: [
+            { required: true, message: '请输入微信账号', trigger: 'blue' }
+          ],
+          wxName: [
+            { required: true, message: '请输入微信昵称', trigger: 'blue' }
+          ],
+          addTime: [
+            { required: true, message: '请选择建号时间', trigger: 'change' }
+          ],
+          countryId: [
+            { required: true, message: '请选择国家', trigger: 'change' }
+          ],
+          universityId: [
+            { required: true, message: '请选择学校', trigger: 'change' }
+          ]
+        }
+      }
+ },
+
+ mounted() {
+
+ },
+ methods: {
+
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

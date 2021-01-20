@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;" @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="id" width="50">
+                <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="姓名" width="80">
+                <template slot-scope="scope">
+                <span>{{ scope.row.callName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="微信号" width="120">
+                <template slot-scope="scope">
+             <span>{{ scope.row.wxAccount }}</span>
+           </template>
+            </el-table-column>
+            <el-table-column label="学校名称" width="120">
+                <template slot-scope="scope">
+            <span>{{ scope.row.schoolName }}</span>
+          </template>
+            </el-table-column>
+            <!-- <el-table-column 
+             label="群组id"
+             width="80">
+             <template slot-scope="scope">
+              <span>{{ scope.row.groupNo }}</span>
+            </template>
+            </el-table-column> -->
+            <el-table-column label="专业名称" width="110">
+                <template slot-scope="scope">
+              <span>{{ scope.row.professionalName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="课程名称" width="110">
+                <template slot-scope="scope">
+             <span>{{ scope.row.temCourseName }}</span>
+           </template>
+            </el-table-column>
+            <el-table-column label="定制需求" width="150">
+                <template slot-scope="scope">
+            <span>{{ scope.row.explained }}</span>
+          </template>
+            </el-table-column>
+            <el-table-column label="下单时间" width="160">
+                <template slot-scope="scope">
+              <span>{{ scope.row.createAt }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">  
+                <el-button size="mini" v-if="scope.row.isMy===1" @click="dialogVisible(scope.row,scope.$index)">抢单</el-button>   
+                <el-button size="mini" v-if="scope.row.isMy===2" @click="apply(scope.row,scope.$index)">接单</el-button>  
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[6]" :page-size="6" layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- import JavaScript -->
+<script src="js/index.js"></script>
+<script src="../../js/base.js"></script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                tableDataBegin: [],
+                tableDataName: "",
+                tableDataEnd: [],
+                currentPage: 0,
+                pageSize: 0,
+                total: 0,
+                filterTableDataEnd: [],
+                dialogFormVisible: false,
+                dialogFormVisible2: false,
+                idss: [],
+                options: [],
+                selectedOptions: [],
+                selects: '',
+                countryId: '',
+                key: '',
+                page: "",
+                val: 1,
+                name: '',
+                superId: '',
+                label: '',
+                dialogStatus: "",
+                ruleForm: {},
+                rules: {}
+            }
+        },
+        multipleSelection: [],
+        mounted() {
+            this.getTableData();
+        },
+        methods: {
+            search: function() {
+
+            },
+            getTableData: function() {
+                const loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading'
+                });
+                var self = this;
+                var token = localStorage.getItem("token");
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "token": token,
+                        "page": this.val,
+                        "limit": 6
+                    },
+                    url: "" + baseURL + "sys/seller/order/getOrderPool",
+                    success: function(json) {
+                        self.tableDataEnd = json.body.list;
+                        self.total = json.body.totalCount;
+                        self.pageSize = json.body.totalCount;
+                        self.currentPage = json.body.currPage;
+                        loading.close();
+                    },
+                    error: function(json) {
+
+                    }
+                });
+            },
+            apply(row, index) {
+                var self = this;
+                this.$confirm('是否要接单?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                    .then(_ => {
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            data: {
+                                "token": localStorage.getItem("token"),
+                                "courseId": row.id,
+                                "groupNo": row.groupNo
+                            },
+                            url: "" + baseURL + "/sys/seller/order/acceptingOrder",
+                            success: function(json) {
+                                if (json.status == "400") {
+                                    vm.$message({
+                                        message: json.body.msg,
+                                        type: 'warning'
+                                    });
+                                    vm.getTableData();
+                                }
+                                if (json.status == "200") {
+                                    vm.$message({
+                                        message: "接单成功,系统正在为您创建群",
+                                        type: 'success'
+                                    });
+                                    localStorage.setItem('stname', row.callName);
+                                    localStorage.setItem('temCourseName', row.temCourseName);
+                                    localStorage.setItem('userId', row.userId);
+                                    window.open("crm2/crm_chat/index.html?id=" + row.id + "&userId=" + row.userId + "", "impage", "");
+                                    vm.getTableData();
+                                }
+                            }
+                        });
+                    })
+                    .catch(_ => {});
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.pageSize = val;
+                this.handleCurrentChange(this.currentPage);
+            },
+
+            dialogVisible(row, _index) {
+                var self = this;
+                this.$confirm('是否要抢单?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                    .then(_ => {
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            data: {
+                                "token": localStorage.getItem("token"),
+                                "courseId": row.id,
+                                "groupNo": row.groupNo
+                            },
+                            url: "" + baseURL + "sys/seller/order/lootOrder",
+                            success: function(json) {
+                                if (json.status == "400") {
+                                    vm.$message({
+                                        message: json.body.msg,
+                                        type: 'warning'
+                                    });
+                                    vm.getTableData();
+                                }
+                                if (json.status == "200") {
+                                    vm.$message({
+                                        message: "抢单成功,系统正在为您创建群",
+                                        type: 'success'
+                                    });
+                                    localStorage.setItem('stname', row.callName);
+                                    localStorage.setItem('temCourseName', row.temCourseName);
+                                    localStorage.setItem('userId', row.userId);
+                                    window.open("crm2/crm_chat/index.html?id=" + row.id + "&userId=" + row.userId + "", "impage", "");
+                                    vm.getTableData();
+                                }
+                            }
+                        });
+                    })
+                    .catch(_ => {});
+            },
+
+            handleCurrentChange(val) {
+                vm.val = val;
+                this.getTableData();
+            },
+
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+                let ids = [];
+                this.multipleSelection.map((item) => {
+                    var id = item.id;
+                    ids.push("" + id + "");
+                });
+                this.selectedIDs = ids;
+                console.log('多选', ids);
+                this.idss = this.selectedIDs;
+                console.log(this.idss);
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+        }
+    });
+</script>
+
+</body>
+
+</html>
+
+</html>

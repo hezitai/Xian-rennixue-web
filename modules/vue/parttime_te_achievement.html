@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-input v-model="teachername" placeholder="请输入老师" style="width:240px"></el-input>
+            <el-date-picker
+              v-model="data"
+              type="daterange"
+              align="right"
+              unlink-panels
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              @change="choosedata"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              :picker-options="pickerOptions2">
+            </el-date-picker>
+            <el-button type="primary" @click="search">搜索</el-button>
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <el-table-column
+            label="ID"
+            width="60">
+            <template slot-scope="scope">
+              <span>{{ scope.row.userId }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+              label="姓名"
+              width="100">
+              <template slot-scope="scope">
+                <span>{{ scope.row.callName }}</span>
+              </template>
+           </el-table-column>
+           <el-table-column
+           label="订单号"
+           width="160">
+           <template slot-scope="scope">
+             <span>{{ scope.row.orderNo }}</span>
+           </template>
+        </el-table-column>
+            <el-table-column
+            label="课程名称"
+            width="100">
+            <template slot-scope="scope">
+              <span>{{ scope.row.offCourseName }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column
+            label="授课时长"
+            width="80">
+            <template slot-scope="scope">
+              <span>{{ scope.row.allSchooltime }}</span>
+            </template>
+          </el-table-column>
+            <el-table-column
+            label="订单类型"
+            width="100">
+            <template slot-scope="scope">
+                <span v-if='scope.row.spoType===0'>定制辅导</span>
+                <span v-if='scope.row.spoType===1'>考前突击</span>
+                <span v-if='scope.row.spoType===2'>包课辅导 </span>
+                <span v-if='scope.row.spoType===4'>论文辅导</span>
+                <span v-if='scope.row.spoType===32'>特殊订单</span> 
+           </template>
+           </el-table-column>
+           <el-table-column 
+           label="订单状态"
+           width="80">
+           <template slot-scope="scope">
+              <span v-if='scope.row.statused>=8 && scope.row.statused<=64'>未接单</span>
+              <span v-if='scope.row.statused===128'>待排课</span>
+              <span v-if='scope.row.statused===256'>已排课</span>
+              <span v-if='scope.row.statused===512'>申请结课中</span>
+          </template>
+          </el-table-column>
+            <el-table-column 
+            label="结束时间"
+            width="160">
+            <template slot-scope="scope">
+              <span>{{ scope.row.updateAt }}</span>
+            </template>
+           </el-table-column>
+           <el-table-column 
+           label="G币"
+           width="60">
+           <template slot-scope="scope">
+             <span>{{ scope.row.teacG }}</span>
+           </template>
+          </el-table-column>
+          <el-table-column 
+          label="otG币"
+          width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.teacOtg }}</span>
+          </template>
+         </el-table-column>
+            <el-table-column label="操作">   
+            </el-table-column> 
+            </el-table>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6,8,10]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        pickerOptions2: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+      tableDataBegin: [],
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 6,
+      total:0,
+      val:1,
+      idss:[],
+      data:null,
+      finishTimeFrom:null,
+      value:'',
+      teachers:'',
+      teacherid:'',
+      teachername:null,
+      finishTimeTo:null,
+      ruleForm: {
+        teacher:'',
+        },
+        rules: {
+        }
+      }
+ },
+ mounted() {
+  this.getTableData(); 
+ },
+ methods: {
+  search:function(){
+    this.getTableData();    
+      },
+  choosedata:function(value){
+    this.finishTimeFrom = value[0];
+    this.finishTimeTo = value[0];
+  },    
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        var token = localStorage.getItem("token");
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": this.pageSize,
+            "dateFrom":this.finishTimeFrom,
+            "dateTo":this.finishTimeTo,
+            "teacherName":this.teachername,
+            "teacherType":2,
+          } ,
+          url : ""+baseURL+"sys/oper/getOperatorOrder",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.pageSize;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         },  
+         error : function(json) {  
+ 
+        }  
+      });    
+      },
+
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.getTableData(); 
+  // this.handleCurrentChange(this.currentPage);
+ },
+
+ handleCurrentChange(val) {
+  vm.val = val;
+  console.log(vm.pageSize);
+  this.getTableData(); 
+ },
+
+  handleSelectionChange(val) {
+    this.multipleSelection = val;
+    let ids = [];
+    this.multipleSelection.map((item)=> {
+      var id = item.id;
+    ids.push(""+id+"");
+    });
+    this.selectedIDs = ids;
+    console.log('多选',ids);
+    this.idss =  this.selectedIDs;
+    console.log(this.idss);
+  },   
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

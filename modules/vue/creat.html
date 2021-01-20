@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div id="app">
+  <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" style="width:800px;" class="demo-ruleForm">
+      <!-- <el-form-item label="课程ID" prop="username">
+        <el-input v-model="ruleForm.username"></el-input>
+      </el-form-item> -->
+      <el-form-item label="姓名" prop="username">
+        <el-input v-model="ruleForm.username"></el-input>
+      </el-form-item>
+      <el-form-item label="微信号" prop="wxAccount">
+        <el-input v-model="ruleForm.wxAccount"></el-input>
+      </el-form-item>
+      <el-form-item label="账号" prop="mobile">
+        <el-input v-model="ruleForm.mobile"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="ruleForm.password"></el-input>
+      </el-form-item>
+      <el-form-item label="国家id" prop="countryId">
+        <el-select v-model="ruleForm.countryId" placeholder="请选择国家id">
+            <el-option
+            v-for="item in countrys"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+            </el-option>
+        </el-select>
+      </el-form-item>
+      <!-- <el-form-item label="大学id" prop="universityId">
+        <el-input v-model="ruleForm.universityId"></el-input>
+      </el-form-item> -->
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('ruleForm')">生成学生账号</el-button>
+      </el-form-item>
+    </el-form>
+</div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        countrys:'',
+        ruleForm: {
+          countryId:'',
+        },
+        rules: {
+          // username: [
+          //   { required: true, message: '请输入学生昵称', trigger: 'blur' },
+          // ],
+          mobile: [
+            { required: true, message: '请输入学生账号', trigger: 'blur' },
+          ],
+          password: [
+            { required: true, message: '请输入学生密码', trigger: 'blur' },
+          ],
+          countryId: [
+            { required: true, message: '请输入国家id', trigger: 'change' },
+          ],
+          universityId: [
+            { required: true, message: '请输入大学id', trigger: 'blur' },
+          ],
+          // wxAccount: [
+          //   { required: true, message: '请输入微信号', trigger: 'blur' },
+          // ]
+        }
+      };
+    },
+  mounted() {
+  this.getcountrys(); 
+  this.list = this.states.map(item => {
+        return { value: item, label: item };
+      });
+ },
+    methods: {
+      change(val){
+        console.log(val)
+      },
+      remoteMethod(query) {
+        if (query !== '') {
+          this.loading = true;
+          setTimeout(() => {
+            this.loading = false;
+            this.options4 = this.list.filter(item => {
+              return item.label.toLowerCase()
+              .indexOf(query.toLowerCase()) > -1;
+            });
+          }, 200);
+        } else {
+          this.options4 = [];
+        }
+      },
+    getcountrys(){
+    $.ajax({  
+      type : "get",  
+      dataType: "json", 
+      data:{
+        "token": token,
+        "page": 1,
+        "limit": 1000
+      } ,
+      url : ""+baseURL+"sys/basedata/country/list",  
+      success : function(json) {  
+        vm.countrys = json.body.list;
+      }
+  });
+  },
+      submitForm(formName) {
+        var self = this;
+        console.log(this.$refs.ruleForm.model.countryId);
+        var token = localStorage.getItem("token");
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            console.log(this.$refs.ruleForm.model);
+            $.ajax({
+              type: "POST",
+              headers: {"token": token},
+                url: ""+baseURL+"/sys/seller/order/createStudAccount",
+                contentType: "application/json",
+                data: JSON.stringify(this.$refs.ruleForm.model),
+                success: function(r){
+                  if(r.status == 200){
+                    self.$message({
+                    message: '创建成功',
+                    type: 'success'
+                  });
+                  }
+              }
+				});
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+    }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>首页</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+.ul{
+    margin: 0 auto;
+    margin-bottom: 30px;
+}
+.ul:after{
+    display: block;clear: both;content: "";visibility: hidden;height: 0   
+}
+.ul li{
+    width: 30%;list-style: none;height: 100px;cursor: pointer;color: #fff;
+}
+.ul li a{
+    display: block;color: #fff;
+}
+.ul li i{
+    font-size: 46px;color: #fff;border-right: 1px solid #fff;width: 25%;display: inline-block;text-align: center;margin-top: 25px;float: left;
+}
+.ul li div{
+    margin-left: 20px;float: left;
+}
+.ul li div p{
+    margin: 0 !important;
+}
+.ul li:nth-child(1){
+    background: #409EFF;float: left;
+}
+.ul li:nth-child(2){
+    background: rgb(250, 192, 3);float: left;margin-left: 2.5%;
+}
+.ul li:nth-child(3){
+    background: #409EFF;float: right;margin-right: 5%;
+}
+.ul li div .p1{
+    font-size: 24px;
+    margin-top: 30px !important;
+}
+</style>
+<body>
+<div class="panel panel-default">
+    <!-- <div class="panel-heading">基本信息</div> -->
+</div>
+<div id="app">
+        <!-- <div style="padding: 10px 0 20px 10px;">生成待抽查数据</div> -->
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" v-show="demoshow">
+        <el-form-item label="开始日期" prop="startTime">
+            <el-date-picker v-model="ruleForm.startTime" type="date" value-format="yyyy-MM-dd" value="yyyy-MM-dd HH:mm:ss" placeholder="开始日期"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束日期" prop="endTime">
+            <el-date-picker v-model="ruleForm.endTime" type="date" value-format="yyyy-MM-dd" value="yyyy-MM-dd HH:mm:ss" placeholder="结束日期"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="分组" prop="deptId">
+            <el-select v-model="ruleForm.deptId" filterable @change="change_group">
+                <el-option label="全部" value="0" key=""></el-option>
+                <el-option
+                v-for="item in groups"
+                :key="item.id"
+                :label="item.name"
+                :value="item.deptId">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="组员" prop="userId">
+            <el-select v-model="ruleForm.userId" filterable @change="change_user">
+                <el-option label="全部" value="0"></el-option>
+                <el-option
+                v-for="item in members"
+                :key="item.id"
+                :label="item.username"
+                :value="item.userId">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="数据量" prop="infoNum">
+            <el-input v-model="ruleForm.infoNum" style="width:220px"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="../../js/base.js"></script>
+<script type="text/javascript"> 
+    var vm = new Vue({  
+      el:'#app',
+      data() {
+        return {
+        demoshow:true,    
+        btnstatus:false,
+        btnval:"生成待抽查数据",
+        groups:'',
+        members:'', 
+        deptId:'', 
+        userId:'',  
+        ruleForm: {
+            startTime:'',
+            endTime:'',
+            deptId:'',
+            infoNum:'',
+            userId:'',
+          },
+          rules: {
+            startTime: [
+              { required: true, message: '请选择开始时间', trigger: 'change' }
+            ],
+            endTime: [
+              { required: true, message: '请选择结束时间', trigger: 'change' }
+            ],
+            addTime: [
+              { required: true, message: '请选择建号时间', trigger: 'change' }
+            ],
+            userId: [
+              { required: true, message: '请选择组员', trigger: 'change' }
+            ],
+            deptId: [
+              { required: true, message: '请选择分组', trigger: 'change' }
+            ],
+            infoNum: [
+              { required: true, message: '请输入数据量', trigger: 'blur' }
+            ]
+          }
+        }
+   },
+  
+   mounted() {
+    this.getgroups();
+    this.jugde();
+   },
+   methods: {
+    resetForm(formName) {
+        this.$refs[formName].resetFields();
+    },
+    change_group(val){
+        vm.deptId = val;
+        vm.getmembers();
+    },
+    change_user(val){
+        vm.userId = val;
+    },
+    jugde(){
+        $.getJSON(baseURL + "sys/user/info", function(r){
+            vm.user = r.user;
+            var roleIdList = r.user.roleIdList;
+            roleIdList.forEach(v=>{
+            if(v === 11) {
+                vm.demoshow = true;
+            }else if(v == 13){
+                vm.c = true;
+            }else if(v === 6){
+                vm.demoshow = true;
+                vm.b = true;
+            }else if(v === 5){
+                vm.a = true;
+            }else{
+                vm.demoshow = false;
+            }
+            })
+        });
+    },
+    getmembers(){
+    $.ajax({  
+        type : "get",  
+        dataType: "json", 
+        data:{
+        "token": token,
+        "page": 1,
+        "limit": 1000,
+        "onlyStaff":true,
+        "deptId":vm.ruleForm.deptId,
+        } ,
+        url : ""+baseURL+"sys/user/getUserListByDept",  
+        success : function(json) {  
+        vm.members = json.body.list;
+        }
+    });
+},
+getgroups(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+    } ,
+    url : ""+baseURL+"sys/dept/queryAllSellerDepts",  
+    success : function(json) {  
+      vm.groups = json.body;
+    }
+});
+},
+formatter(row, column) {
+    return row.address;
+},
+submitForm(formName) {
+    var data = vm.ruleForm;
+    this.$refs[formName].validate((valid) => {
+        if (valid) {
+            if(this.$refs.ruleForm.model.deptId === "0"){
+                vm.deptId = "";
+            }
+            if(this.$refs.ruleForm.model.userId === "0"){
+                vm.userId = "";
+            }
+            vm.btnstatus=true,
+            vm.btnval="加载中",
+            $.ajax({  
+            type : "post",  
+            contentType: "application/json", 
+            headers: {"token": token},
+            data:JSON.stringify({
+                deptId:vm.deptId,
+                endTime:vm.ruleForm.endTime+" 23:59:59",
+                infoNum:vm.ruleForm.infoNum,
+                startTime:vm.ruleForm.startTime+" 00:00:00",
+                userId:vm.userId,
+        "excuDeptId":16
+            }) ,
+            url : ""+baseURL+"sys/checkList/createCheckList",  
+            success : function(json) {  
+            if(json.status == 200){
+                vm.$message({
+                message: json.body.msg,
+                type: 'success'
+                });
+                vm.resetForm(formName);
+                vm.btnstatus=false;
+                vm.btnval="生成待抽查数据";
+                }
+                if(json.status == 400){
+                vm.$message({
+                message: json.body.msg,
+                type: 'warning'
+                });
+                vm.btnstatus=false;
+                vm.btnval="生成待抽查数据";
+                }
+            }
+        });
+        } else {
+        console.log('error submit!!');
+        return false;
+        }
+    });
+    },
+}
+  });
+</script> 
+</html>

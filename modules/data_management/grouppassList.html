@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+  .demo-ruleForm{
+    width:50%;
+    margin: 0 auto;
+  }
+  .el-row {
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }
+  .actived{
+    background: #409EFF !important;
+    color: #fff;
+  }
+  .datas p{
+    float: left;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    list-style: none;
+    padding: 4px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    background: #ddd;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .span, .datas{
+    float: left;
+  }
+  .fl{
+    float: left;
+  }
+  .fldata{
+    margin-left: 10px;
+  }
+</style>
+<body>
+    <div id="app">
+      <div v-show="usertable">
+        <el-input v-model="tableDataName" placeholder="请输入内容" style="width:240px"></el-input>
+        <el-button type="primary" @click="serach_data">搜索</el-button>
+        <!-- <el-button type="primary" @click="addDate">添加</el-button> -->
+        <div class="el-row">
+          <span class="span">时间:</span>
+          <div class="datas">
+            <!-- <p @click="query('today')" v-bind:class="{actived: isActive1}">当天</p>
+            <p @click="query('yesterday')" v-bind:class="{actived: isActive2}">昨天</p> -->
+            <p @click="query('weeks')" v-bind:class="{actived: isActive3}">本周</p>
+            <p @click="query('lastWeek')" v-bind:class="{actived: isActive4}">上周</p>
+            <p @click="query('month')" v-bind:class="{actived: isActive5}">本月</p>
+            <p @click="query('lastMonth')" v-bind:class="{actived: isActive6}">上月</p>
+            <div class="fl fldata">
+              <el-date-picker @change="change_starttime" v-model="ruleForm.value1" type="date" value-format="yyyy-MM-dd" value="yyyy-MM-dd" placeholder="开始日期">
+              </el-date-picker>
+            </div>
+            <div class="fl fldata">
+              <el-date-picker @change="change_endtime" v-model="ruleForm.value2" type="date" value-format="yyyy-MM-dd" value="yyyy-MM-dd" placeholder="结束日期">
+              </el-date-picker>
+            </div>
+          </div>
+        </div>
+        <div class="el-row">
+          <span class="span">筛选:</span>
+          <div class="datas">
+            <!-- <p v-bind:class="{actived: isArea1}" @click="area_all">全部</p> -->
+            <el-select v-model="ruleForm.countryId" filterable placeholder="请选择国家" @change="change_country" style="margin-left:10px;">
+              <el-option label="全部" value=""></el-option>
+              <el-option
+              v-for="item in countrys"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+              </el-option>
+            </el-select>
+            <el-select v-model="ruleForm.universityId" filterable placeholder="请选择学校" @change="change_universitys">
+            <el-option label="全部" value=""></el-option>
+            <el-option
+            v-for="item in universitys"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+            </el-option>
+          </el-select>
+          <el-select v-model="ruleForm.professionalId" filterable placeholder="请选择专业" @change="change_professionalId">
+            <el-option label="全部" value=""></el-option>
+            <el-option
+            v-for="item in professionalNames"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+            </el-option>
+          </el-select>
+          <el-select v-model="ruleForm.level" filterable placeholder="请选择学术级别" @change="change_level">
+            <el-option label="全部" value=""></el-option>
+            <el-option
+            v-for="item in levels"
+            :key="item.id"
+            :label="item.levelName"
+            :value="item.id">
+            </el-option>
+          </el-select>
+          </div>
+        </div>
+        <!-- <div class="el-row">
+          <span class="span">组别:</span>
+          <div class="datas">
+              <el-select v-model="ruleForm.groupId" filterable @change="change_group" style="margin-left:10px;">
+                <el-option label="全部" value=""></el-option>
+                <el-option
+                v-for="item in groups"
+                :key="item.id"
+                :label="item.name"
+                :value="item.deptId">
+                </el-option>
+              </el-select>
+          </div>
+        </div> -->
+        <div class="el-row">
+          <span class="span">专员:</span>
+          <div class="datas">
+              <!-- <p v-bind:class="{actived: ismember1}" @click="group_all">全部</p> -->
+              <el-select v-model="ruleForm.getmemberId" filterable @change="change_getmember" style="margin-left:10px;">
+                <el-option label="全部" value=""></el-option>
+                <el-option
+                v-for="item in members"
+                :key="item.id"
+                :label="item.username"
+                :value="item.userId">
+                </el-option>
+              </el-select>
+          </div>
+        </div>
+        <div class="el-row">
+          <span class="span">关联微信号:</span>
+          <div class="datas">
+            <el-select v-model="ruleForm.wx" filterable placeholder="请选择关联微信号" style="margin-left:10px;" @change="change_wxid">
+              <el-option label="全部" value=""></el-option>
+              <el-option
+              v-for="item in wxaccounts"
+              :key="item.id"
+              :label="item.wxAccount"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+        <div class="el-row">
+          <!-- <span class="fl">已选<span>{{num}}</span>条数据</span> -->
+          <!-- <el-button class="fl fldata" type="primary" size="mini" @click="yes">通过</el-button>
+          <el-button class="fl fldata" type="primary" size="mini" @click="no">不通过</el-button> -->
+          <!-- <el-button class="fl fldata" type="primary" size="mini" @click="edit">编辑</el-button> -->
+          <!-- <el-button class="fl fldata" type="primary" size="mini" @click="del">删除</el-button>
+          <el-select v-model="statused" @change="change_statused" style="margin-left:10px;">
+            <el-option value="1,5,10" label="全部"></el-option>
+            <el-option value="1" label="未审核"></el-option>
+            <el-option value="10" label="通过"></el-option>
+            <el-option value="5" label="未通过"></el-option>
+          </el-select> -->
+        </div>
+        <el-table 
+        :data="tableDataEnd"
+        ref="multipleTable"
+        border
+        style="width: 100%;margin-top:5px;"
+        :default-sort = "{prop: 'date', order: 'descending'}"
+        @selection-change="handleSelectionChange">
+          <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column>
+        <el-table-column
+        width="50"
+        label="id">
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column
+        sortable
+        width="110"
+        label="来自微信">
+        <template slot-scope="scope">
+          <span>{{ scope.row.sysWxAccountName }}</span>
+        </template>
+      </el-table-column>
+        <el-table-column
+          sortable
+          width="100"
+          label="微信号">
+          <template slot-scope="scope">
+            <span>{{ scope.row.wxAccount }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="姓名">
+        <template slot-scope="scope">
+          <span>{{ scope.row.studentName }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="国家">
+        <template slot-scope="scope">
+          <span>{{ scope.row.countryName }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="学校">
+        <template slot-scope="scope">
+          <span>{{ scope.row.universityName }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="专业">
+        <template slot-scope="scope">
+          <span>{{ scope.row.professionalName }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="130"
+        label="内容/微信群">
+        <template slot-scope="scope">
+          <span>{{ scope.row.contents }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="110"
+        label="添加时间">
+        <template slot-scope="scope">
+          <span>{{ scope.row.addTime }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="110"
+        label="学术等级">
+        <template slot-scope="scope">
+          <span>{{ scope.row.levelName }}</span>
+        </template>
+        </el-table-column>
+        <!-- <el-table-column
+        sortable
+        width="110"
+        label="入学时间">
+        <template slot-scope="scope">
+          <span>{{ scope.row.enrolTimeName }}</span>
+        </template>
+        </el-table-column> -->
+        <el-table-column
+        sortable
+        width="110"
+        label="专员">
+        <template slot-scope="scope">
+          <span>{{ scope.row.userName }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="组长">
+        <template slot-scope="scope">
+            <el-tag v-if='scope.row.groupCheckStatus===0' type="danger">未审核</el-tag>
+            <el-tag v-if='scope.row.groupCheckStatus===1' type="success">已通过</el-tag>
+            <el-tag v-if='scope.row.groupCheckStatus===2' type="warning">不通过</el-tag>
+            <span>{{ scope.row.groupCheckDesc }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column
+        sortable
+        width="80"
+        label="经理">
+        <template slot-scope="scope">
+            <el-tag v-if='scope.row.managerCheckStatus===0' type="danger">未审核</el-tag>
+            <el-tag v-if='scope.row.managerCheckStatus===1' type="success">已通过</el-tag>
+            <el-tag v-if='scope.row.managerCheckStatus===2' type="warning">不通过</el-tag>
+            <span>{{ scope.row.managerCheckDesc }}</span>
+        </template>
+        </el-table-column>
+        </el-table>
+        <el-pagination
+        style="margin-top:15px"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[100,150]"
+          :page-size="100"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+        </div>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm" v-show="userform">
+          <el-form-item label="微信账号" prop="wxAccount">
+              <el-select v-model="ruleForm.wxAccount" filterable placeholder="请选择微信账号" @change="change_wxaccount">
+              <el-option
+              v-for="item in wxaccounts"
+              :key="item.id"
+              :label="item.wxName"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="学生姓名" prop="studentName">
+            <el-input v-model="ruleForm.studentName"></el-input>
+          </el-form-item>
+          <el-form-item label="留学国家" prop="countryId">
+              <el-select v-model="ruleForm.countryId" filterable placeholder="请选择留学国家" @change="change_countrys">
+              <el-option
+              v-for="item in countrys"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="学校" prop="universityId">
+              <el-select v-model="ruleForm.universityId" filterable placeholder="请选择学校">
+              <el-option
+              v-for="item in universitys"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="学术级别" prop="level">
+              <el-select v-model="ruleForm.level" filterable placeholder="请选择学术级别">
+              <el-option
+              v-for="item in levels"
+              :key="item.id"
+              :label="item.levelName"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="专业" prop="professionalId">
+              <el-select v-model="ruleForm.professionalId" filterable placeholder="请选择专业">
+              <el-option
+              v-for="item in professionalNames"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="微信创建人" prop="sysWxAccount">
+            <el-input v-model="sysWxAccount" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="建号时间" required>
+            <el-col :span="11">
+              <el-form-item prop="examTime">
+                <el-date-picker type="date" :picker-options="pickerOptions" placeholder="选择日期" v-model="ruleForm.addTime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <!-- <el-form-item label="入学时间" prop="enrolTime">
+              <el-select v-model="ruleForm.enrolTime" filterable placeholder="请选择入学时间">
+              <el-option
+              v-for="item in enroltimes"
+              :key="item.id"
+              :label="item.enrolTime"
+              :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item> -->
+          <el-form-item label="内容/微信群" prop="contents">
+            <el-input v-model="ruleForm.contents"></el-input>
+          </el-form-item>
+          <el-form-item label="备注" prop="description">
+            <el-input v-model="ruleForm.description"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" v-bind:loading="btnstatus" @click="submit('ruleForm')">{{btnval}}</el-button>
+            <el-button @click="back">返回</el-button>
+          </el-form-item>
+        </el-form>
+        <!-- 弹框 -->
+        <el-dialog
+        :visible.sync="modal"
+        width="40%">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px">
+            <el-form-item label="请选择不通过原因" prop="reason">
+                <el-select v-model="ruleForm.reason" placeholder="请选择不通过原因" style="width:250px;">
+                    <el-option
+                    v-for="item in reasons"
+                    :key="item.id"
+                    :label="item.exceptionName"
+                    :value="item.id">
+                    </el-option>
+                  </el-select>
+            </el-form-item>
+            <el-form-item label="备注" prop="groupCheckDesc">
+              <el-input  type="textarea" :rows="3" style="width:250px;" v-model="ruleForm.groupCheckDesc"></el-input>
+            </el-form-item>
+          </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}</el-button>
+        </span>
+      </el-dialog>
+    </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript"> 
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      }, 
+      managerCheckStatus:2,
+      typeids:[],
+      type:false,
+      states:'',
+      onlyStaff:true,
+      rowid:'',
+      btnstatus:false,
+      btnval:"确 定",
+      modal:false,
+      num:0,
+      userId:'',
+      startdatetime:'',
+      enddatetime:'',
+      start:" 00:00:01",
+      end:" 23:59:59",
+      startTime:'',  
+      endTime:'',
+      statused:"20",
+      changeRed:-1,
+      isActive1: true,
+      isActive2: false,
+      isActive3: false,
+      isActive4: false,
+      isActive5: false,
+      isActive6: false,
+      btnstatus:false,
+      isArea1:true,
+      isgroup1:true,
+      ismember1:true,
+      btnval:"确 定",
+      usertable:true,
+      userform:false,  
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      limit:100,
+      page:1,
+      idss:[],
+      ids:[],
+      value:'',
+      countrys:'',
+      universitys:'',
+      countryId:'',
+      professionalNames:'',
+      levels:'',
+      wxaccounts:'',
+      wxAccount:'',
+      id:'',
+      enroltimes:'',
+      getmemberes:'',
+      members:'',
+      reasons:'',
+      sysWxAccount:'',
+      groups:'',
+      ruleForm: {
+        wx:'',
+        wxAccount:'',
+        wxName:'',
+        countryId:'',
+        addTime:'',
+        enrolTime:'',
+        level:'',
+        studentName:'',
+        contents:'',
+        description:'',
+        universityId:'',
+        professionalId:'',
+        value1:'',
+        value2:'',
+        getmemberId:'',
+        groupCheckDesc:'',
+        reason:'',
+        groupId:'',
+        },
+        rules: {
+          wxAccount: [
+            { required: true, message: '请输入微信账号', trigger: 'blue' }
+          ],
+          addTime: [
+            { required: true, message: '请选择建号时间', trigger: 'change' }
+          ],
+          countryId: [
+            { required: true, message: '请选择国家', trigger: 'change' }
+          ],
+          universityId: [
+            { required: true, message: '请选择学校', trigger: 'change' }
+          ],
+          // enrolTime: [
+          //   { required: true, message: '请选择入学时间', trigger: 'change' }
+          // ],
+          level: [
+            { required: true, message: '请选择学术级别', trigger: 'change' }
+          ],
+          professionalId: [
+            { required: true, message: '请选择专业', trigger: 'change' }
+          ],
+          studentName: [
+            { required: true, message: '请输入学生姓名', trigger: 'blue' }
+          ],
+          contents: [
+            { required: true, message: '请输入信息', trigger: 'blue' }
+          ],
+          description: [
+            { required: true, message: '请输入备注', trigger: 'blue' }
+          ],
+          groupCheckDesc: [
+            { required: true, message: '请选择原因', trigger: 'change' }
+          ],
+          reason: [
+            { required: true, message: '请填写备注', trigger: 'blue' }
+          ]
+        }
+      }
+ },
+ multipleSelection: [],
+ mounted() {
+  this.getTableData(); 
+  this.getcountrys();
+  this.getprofessionalNames();
+  this.getlevels();
+  this.getgroups();
+  this.getmembers();
+ },
+ methods: {
+  choosedata:function(value){
+    this.value = value;
+  },   
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "startCreateAt":this.startdatetime,
+            "endCreateAt":this.enddatetime,
+            "page":this.page,
+            "limit":this.limit,
+            "key":this.key,
+            "countryId": this.countryId,
+            "universityId":this.ruleForm.universityId,
+            "level":this.ruleForm.level,
+            "professionalId":this.ruleForm.professionalId,
+            "key":this.tableDataName,
+            "userId":this.ruleForm.getmemberId,
+            "deptId":this.ruleForm.groupId,
+            "isAllDept":this.onlyStaff,
+            "statused":this.statused,
+            "sysWxAccount":this.ruleForm.wx,
+          } ,
+          url : ""+baseURL+"sys/studWx/listGroup",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }  
+      });    
+      },
+addDate(){
+  vm.userform = true;
+  vm.usertable = false;
+  vm.getUser();
+  vm.getwxaccounts();
+  vm.getenroltimes();
+  vm.ruleForm.countryId = "";
+  vm.ruleForm.universityId = "";
+  vm.ruleForm.level = "";
+  vm.ruleForm.professionalId = "";
+}, 
+change_wxid(){
+  vm.page = 1;
+  vm.serach();
+} ,
+getwxs(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "isMy":true,
+      "receiverId" : vm.ruleForm.getmemberId ,
+      "isSerach" : true,
+    } ,
+    url : ""+baseURL+"sys/basedata/wxManager/list",  
+    success : function(json) {  
+      vm.wxaccounts = json.body.list;
+    }
+});
+},  
+getUser(){
+  $.getJSON(baseURL + "sys/user/info", function(r){
+    vm.ruleForm.sysWxAccount = r.user.username;
+  });
+}, 
+back(){
+  // vm.userform = false;
+  // vm.usertable = true; 
+  // vm.ruleForm.countryId = "";
+  // vm.ruleForm.universityId = "";
+  // vm.ruleForm.level = "";
+  // vm.ruleForm.professionalId = "";
+  // vm.getTableData();
+  window.location.reload();
+},  
+submitForm(formName){
+      let self = this;
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+        vm.btnstatus=true;
+        vm.btnval="加载中";
+      $.ajax({  
+        type : "post",  
+        dataType : "json", 
+        cache: false, 
+        contentType: "application/json",
+        headers: {"token": token},
+        data:JSON.stringify({
+          wxName:vm.ruleForm.wxName,
+          studentName:vm.ruleForm.wxName,
+          countryId:vm.ruleForm.countryId,
+          universityId:vm.ruleForm.universityId,
+          addTime:vm.ruleForm.addTime,
+          // enrolTime:vm.ruleForm.enrolTime,
+          enrolTime:1,
+          professionalId:vm.ruleForm.professionalId,
+          level:vm.ruleForm.level,
+          contents:vm.ruleForm.contents,
+          description:vm.ruleForm.description,
+          sysWxAccount:vm.id,
+          wxAccount:vm.wxAccount,
+        }),
+        url : ""+baseURL+"sys/studWx/putStudWx",  
+        success : function(json) {  
+          if(json.status == "200"){
+            vm.$message({
+            message: json.body.msg,
+            type: 'success'
+          });
+          vm.btnstatus=false;
+          vm.btnval="创 建";
+          vm.userform = false;
+          vm.usertable = true; 
+          vm.getTableData();
+          }
+          if(json.status == "400"){
+            vm.$message({
+            message: json.body.msg,
+            type: 'warning'
+          });
+          vm.btnstatus=false;
+          vm.btnval="创 建";
+          }
+        } 
+    });
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
+},
+getwxaccounts(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "isMy":true
+    } ,
+    url : ""+baseURL+"sys/basedata/wxManager/list",  
+    success : function(json) {  
+      vm.wxaccounts = json.body.list;
+    }
+});
+},
+getcountrys(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000
+    } ,
+    url : ""+baseURL+"sys/basedata/country/list",  
+    success : function(json) {  
+      vm.countrys = json.body.list;
+    }
+});
+},
+getuniversitys(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "countryId":vm.countryId
+    } ,
+    url : ""+baseURL+"sys/basedata/university/list",  
+    success : function(json) {  
+      vm.universitys = json.body.list;
+    }
+});
+}, 
+getprofessionalNames(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000
+    } ,
+    url : ""+baseURL+"sys/basedata/professionalCourses/list",  
+    success : function(json) {  
+      vm.professionalNames = json.body.list;
+    }
+});
+},
+getlevels(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000
+    } ,
+    url : ""+baseURL+"sys/basedata/level/queryAll",  
+    success : function(json) {  
+      vm.levels = json.body;
+    }
+});
+},
+getenroltimes(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000
+    } ,
+    url : ""+baseURL+"sys/basedata/enrolTime/list",  
+    success : function(json) {  
+      vm.enroltimes = json.body.list;
+    }
+});
+},
+getmembers(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "onlyStaff":true,
+    } ,
+    url : ""+baseURL+"sys/user/getMyDeptUserList",  
+    success : function(json) {  
+      vm.members = json.body.list;
+    }
+});
+},
+getgroups(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+    } ,
+    url : ""+baseURL+"sys/dept/queryAllSellerDepts",  
+    success : function(json) {  
+      vm.groups = json.body;
+    }
+});
+},
+change_country(val){
+  vm.countryId = val;
+  vm.getuniversitys();
+  if(vm.ruleForm.universityId !== undefined){
+    vm.ruleForm.universityId = "";
+  };
+  if(vm.usertable == true){
+    vm.isArea1 = false;
+    vm.page = 1;
+    vm.serach();
+  };
+},
+change_countrys(val){
+  vm.countryId = val;
+  vm.getuniversitys();
+  if(vm.ruleForm.universityId !== undefined){
+    vm.ruleForm.universityId = "";
+  };
+  if(vm.usertable == true){
+    vm.isArea1 = false;
+  };
+},
+change_universitys(val){
+  vm.ruleForm.universityId = val;
+  if(vm.usertable == true){
+    vm.isArea1 = false;
+    vm.page = 1;
+    vm.serach();
+  };
+},
+change_professionalId(val){
+  vm.ruleForm.professionalId = val;
+  if(vm.usertable == true){
+    vm.isArea1 = false;
+    vm.page = 1;
+    vm.serach();
+  };
+},
+change_level(val){
+  vm.ruleForm.level = val;
+  if(vm.usertable == true){
+    vm.isArea1 = false;
+    vm.page = 1;
+    vm.serach();
+  };
+},
+area_all(){
+  if(vm.usertable == true){
+    vm.ruleForm.level = "";
+    vm.ruleForm.professionalId="";
+    vm.ruleForm.universityId="";
+    vm.ruleForm.countryId="";
+    vm.countryId="";
+    vm.universitys = "";
+    vm.isArea1 = true;
+    vm.page = 1;
+    vm.serach();
+  };
+},
+change_wxaccount(val){
+  let obj = {};
+  obj = this.wxaccounts.find((item)=>{
+      return item.id === val;
+  });
+  vm.wxAccount = obj.wxAccount;
+  vm.id = obj.id;
+},
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.limit = val;
+  this.handleCurrentChange(this.currentPage);
+ },  
+ handleCurrentChange(val) {
+  vm.page = val;
+  this.getTableData(); 
+ }, 
+handleSelectionChange(val) {
+  this.multipleSelection = val;
+  let ids = [];
+  let typeids = [];
+  this.multipleSelection.map((item)=> {
+  var id = item.id;
+  vm.rowid = item.id;
+  vm.states =  item.statused;
+  ids.push(""+id+"");
+  vm.num = val.length;
+  typeids.push(item.statused);
+  });
+  vm.typeids = typeids;
+  this.selectedIDs = ids;
+  this.idss =  this.selectedIDs;
+  if(this.selectedIDs == ""){
+    vm.num = 0;
+  }
+  if(vm.usertable === true){
+
+  }
+},   
+Time(now){
+  let year=new Date(now).getFullYear();
+  let month=new Date(now).getMonth()+1;
+  let date=new Date(now).getDate();
+  if (month < 10) month = "0" + month;
+  if (date < 10) date = "0" + date;
+  return year+"-"+month+"-"+date;
+}, 
+//本周第一天；
+showWeekFirstDay(){
+  let Nowdate=new Date();
+  let WeekFirstDay=new Date(Nowdate-(Nowdate.getDay()-1)*86400000);
+  let M=Number(WeekFirstDay.getMonth())+1;
+  if(M<10){
+    M="0"+M;
+  }
+  let D=WeekFirstDay.getDate();
+  if(D<10){
+    D="0"+D;
+  }
+  return WeekFirstDay.getFullYear()+"-"+M+"-"+D;
+},
+//本周最后一天
+showWeekLastDay(){
+  let Nowdate=new Date();
+  let WeekFirstDay=new Date(Nowdate-(Nowdate.getDay()-1)*86400000);
+  let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);
+  let M=Number(WeekLastDay.getMonth())+1;
+  if(M<10){
+    M="0"+M;
+  }
+  let D=WeekLastDay.getDate();
+  if(D<10){
+    D="0"+D;
+  }
+  return WeekLastDay.getFullYear()+"-"+M+"-"+D;
+},
+//获得某月的天数：
+getMonthDays(myMonth){
+  let monthStartDate = new Date(new Date().getFullYear(), myMonth, 1);
+  let monthEndDate = new Date(new Date().getFullYear(), myMonth + 1, 1);
+  let   days   =   (monthEndDate   -   monthStartDate)/(1000   *   60   *   60   *   24);
+  return  days;
+},  
+//点击事件
+query:function (way) {
+      let self=this;
+      // this.$refs.pag.currentPage=1;
+      // this.page=this.$refs.pag.currentPage;
+      switch (way){
+        case 'today':
+          this.startTime=this.Time(new Date().getTime());
+          this.endTime=this.Time(new Date().getTime());
+          vm.isActive1 = true;
+          vm.isActive2 = false;
+          vm.isActive3 = false;
+          vm.isActive4 = false;
+          vm.isActive5 = false;
+          vm.isActive6 = false;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+        case 'yesterday':
+          this.startTime=this.Time(new Date().getTime()-24*60*60*1000);
+          this.endTime=this.Time(new Date().getTime()-24*60*60*1000);
+          vm.isActive1 = false;
+          vm.isActive2 = true;
+          vm.isActive3 = false;
+          vm.isActive4 = false;
+          vm.isActive5 = false;
+          vm.isActive6 = false;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+        case 'weeks':
+          this.startTime=this.showWeekFirstDay();
+          this.endTime=this.showWeekLastDay();
+          vm.isActive1 = false;
+          vm.isActive2 = false;
+          vm.isActive3 = true;
+          vm.isActive4 = false;
+          vm.isActive5 = false;
+          vm.isActive6 = false;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+        case 'lastWeek':
+          this.startTime=this.Time(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-new Date().getDay()-6));
+          this.endTime=this.Time(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+(6-new Date().getDay()-6)));
+          vm.isActive1 = false;
+          vm.isActive2 = false;
+          vm.isActive3 = false;
+          vm.isActive4 = true;
+          vm.isActive5 = false;
+          vm.isActive6 = false;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+        case 'month':
+          this.startTime=this.Time(new Date(new Date().getFullYear(), new Date().getMonth(),1));
+          this.endTime=this.Time(new Date(new Date().getFullYear(),new Date().getMonth(),this.getMonthDays(new Date().getMonth())));
+          vm.isActive1 = false;
+          vm.isActive2 = false;
+          vm.isActive3 = false;
+          vm.isActive4 = false;
+          vm.isActive5 = true;
+          vm.isActive6 = false;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+        case 'lastMonth':
+          this.startTime=this.Time(new Date(new Date().getFullYear(),new Date().getMonth()-1,1));
+          this.endTime=this.Time(new Date(new Date().getFullYear(),new Date().getMonth()-1,this.getMonthDays(new Date().getMonth()-1)));
+          vm.isActive1 = false;
+          vm.isActive2 = false;
+          vm.isActive3 = false;
+          vm.isActive4 = false;
+          vm.isActive5 = false;
+          vm.isActive6 = true;
+          vm.ruleForm.value1 = "";
+          vm.ruleForm.value2 = "";
+          break;
+      }
+      vm.serach();
+    },
+    serach(){
+      var self = this;
+      if(vm.startTime !== ""){
+        vm.startdatetime = vm.startTime+vm.start;
+        vm.enddatetime = vm.endTime+vm.end;
+      }else{
+        vm.startdatetime = vm.startdatetime;
+        vm.enddatetime = vm.enddatetime;
+      }
+      $.ajax({  
+      type : "get",  
+      dataType: "json", 
+      data:{
+        "token": token,
+        "startCreateAt":vm.startdatetime,
+        "endCreateAt":vm.enddatetime,
+        "page":vm.page,
+        "limit":vm.limit,
+        "key":vm.key,
+        "countryId": vm.countryId,
+        "universityId":vm.ruleForm.universityId,
+        "level":vm.ruleForm.level,
+        "professionalId":vm.ruleForm.professionalId,
+        "key":vm.tableDataName,
+        "userId":vm.ruleForm.getmemberId,
+        "deptId":vm.ruleForm.groupId,
+        "isAllDept":vm.onlyStaff,
+        "statused":vm.statused,
+        "sysWxAccount":vm.ruleForm.wx,
+      } ,
+      url : ""+baseURL+"sys/studWx/listGroup",  
+      success : function(json) {  
+        self.tableDataEnd=json.body.list;  
+        self.total = json.body.totalCount;
+        self.pageSize = json.body.totalCount;
+        self.currentPage = json.body.currPage;
+      }
+  });
+      },
+serach_data(){
+  if(vm.tableDataName !== ""){
+    vm.page = 1;
+    vm.serach();
+  }
+},  
+change_starttime(val){
+  if(val !==""){
+    vm.isActive1 = false;
+    vm.isActive2 = false;
+    vm.isActive3 = false;
+    vm.isActive4 = false;
+    vm.isActive5 = false;
+    vm.isActive6 = false;
+    vm.startdatetime = val + " 00:00:00";
+  };
+  if(vm.ruleForm.value1 !==""&&vm.ruleForm.value2 !==""){
+
+    vm.page = 1;
+    vm.serach();
+  }
+},
+change_endtime(val){
+  if(val !==""){
+    vm.isActive1 = false;
+    vm.isActive2 = false;
+    vm.isActive3 = false;
+    vm.isActive4 = false;
+    vm.isActive5 = false;
+    vm.isActive6 = false;
+    vm.enddatetime = val + " 23:59:59";
+  };
+  if(vm.ruleForm.value1 !==""&&vm.ruleForm.value2 !==""){
+
+    vm.page = 1;
+    vm.serach();
+  }
+},
+group_all(){
+  vm.ismember1 = true;
+  vm.ruleForm.getmemberId = "";
+  vm.page = 1;
+  vm.serach();
+},
+change_getmember(val){
+  if(val == ""){
+    vm.ismember1 = true;
+  }
+  vm.ruleForm.getmemberId = val;
+  vm.getwxs();
+  vm.ruleForm.wx = "";
+  vm.page = 1;
+  vm.ismember1 = false;
+  vm.serach();
+},
+yes(){
+  vm.typeids.forEach(v=>{
+    if(v === 1){
+      　　vm.$message({
+          message: '主管还没审核',
+          type: 'warning'
+        });
+        return;
+    }else if(v === 5){
+      if(vm.idss.length === 1){
+        vm.modal = true;
+        vm.getreason();
+        vm.managerCheckStatus = 1;
+        return
+      }else{
+        　vm.$message({
+          message: '只能选择一条数据',
+          type: 'warning'
+        });
+      }
+      return; 
+    }else{
+      this.$confirm('是否通过?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      .then(_ => {
+    $.ajax({  
+        type : "post",  
+        contentType: "application/json", 
+        data:JSON.stringify({
+          "token": token,
+          "checkIds": vm.idss ,
+          "managerCheckStatus":	1,
+        }) ,
+        url : ""+baseURL+"sys/studWx/putCheckResultByManager",  
+        success : function(json) {  
+          if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.getTableData(); 
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            vm.getTableData(); 
+            }
+        }
+    });
+  })
+    .catch(_ => {
+          });
+    }
+  });
+},
+no(){
+　　if (vm.idss.length === 0) {
+　　    vm.$message({
+        message: '请选择您要不通过的列表',
+        type: 'warning'
+    });
+　　}else if(vm.states === 1){
+  　　  vm.$message({
+        message: '主管未审核',
+        type: 'warning'
+    });
+}else if(vm.idss.length > 1){
+  　　  vm.$message({
+        message: '只能选择一条数据',
+        type: 'warning'
+    });
+}else{
+  vm.modal = true;
+  vm.managerCheckStatus = 2;
+  vm.getreason();
+}
+},
+getreason(){
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      "token": token,
+      "page": 1,
+      "limit": 1000,
+      "type":1,
+    } ,
+    url : ""+baseURL+"sys/basedata/exceptionList/list",  
+    success : function(json) {  
+      vm.reasons = json.body.list;
+    }
+});
+},
+submitForm(formName) {
+  var self = this;
+  this.$refs[formName].validate((valid) => {
+      if (valid) {
+        vm.btnstatus=true;
+        vm.btnval="加载中";
+        $.ajax({  
+          type : "post",  
+          contentType: "application/json",
+          headers: {"token": token},
+          data:JSON.stringify({
+            checkIds:vm.idss,
+            managerCheckStatus:vm.managerCheckStatus,
+            managerExceptionTypeId:this.$refs.ruleForm.model.reason,
+            managerCheckDesc:this.$refs.ruleForm.model.groupCheckDesc,
+          }),
+          url : ""+baseURL+"sys/studWx/putCheckResultByManager",  
+          success : function(json) {  
+            if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.modal = false;
+            vm.btnstatus=false;
+            vm.btnval="确 定";
+            vm.ruleForm.reason="";
+            vm.ruleForm.groupCheckDesc="";
+            vm.getTableData(); 
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            vm.modal = false;
+            vm.btnstatus=false;
+            vm.btnval="确 定";
+            }
+          }
+      });
+      }
+    });
+  },
+edit(){
+  　　if (vm.idss.length === 0) {
+    　　vm.$message({
+        message: '请选择您要编辑的列表',
+        type: 'warning'
+  });
+  　　}else if(vm.idss.length > 1){
+  　　  vm.$message({
+        message: '只能选择一条数据',
+        type: 'warning'
+  });
+}else{
+  $.ajax({  
+    type : "get",  
+    dataType: "json", 
+    data:{
+      token: token,
+      id: vm.rowid,
+    } ,
+    url : ""+baseURL+"sys/studWx/getStudWxInfo",  
+    success : function(json) {  
+      vm.sysWxAccount=json.body.userName;
+      vm.ruleForm=json.body;
+    }
+});
+vm.usertable = false;
+vm.userform = true;
+}
+}, 
+submit(formName){
+  var self = this;
+  var dataform = this.ruleForm;
+  this.$refs[formName].validate((valid) => {
+      if (valid) {
+        vm.btnstatus=true;
+        vm.btnval="加载中";
+        $.ajax({  
+          type : "post",  
+          contentType: "application/json",
+          headers: {"token": token},
+          data:JSON.stringify(
+            dataform
+          ),
+          url : ""+baseURL+"sys/studWx/updateStudWx",  
+          success : function(json) {  
+            if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.modal = false;
+            vm.btnstatus=false;
+            vm.btnval="确 定";
+            setTimeout(function(){
+              window.location.reload();
+            },1000);
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            vm.modal = false;
+            vm.btnstatus=false;
+            vm.btnval="确 定";
+            }
+          }
+      });
+      }
+    });
+}, 
+groupname_all(){
+  vm.isgroup1 = true;
+  vm.ruleForm.groupId = "";
+  vm.onlyStaff = true;
+  vm.serach();
+},
+change_group(val){
+  vm.ruleForm.groupId = val;
+  vm.getmembers();
+  vm.isgroup1 = false;
+  if(val === ""){
+    vm.onlyStaff = true;
+    vm.isgroup1 = true;
+    vm.serach();
+  }else{
+    vm
+    .onlyStaff = false;
+    vm.serach();
+  }
+},
+change_statused(val){
+  vm.statused = val;
+  vm.serach();
+},
+del(){
+　　if (vm.idss.length === 0) {
+　　  vm.$message({
+      message: '请选择至少一条数据',
+      type: 'warning'
+    });
+    return false;
+　　}else{
+  this.$confirm('是否删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      .then(_ => {
+    $.ajax({  
+        type : "post",  
+        contentType: "application/json", 
+        headers: {"token": token},
+        data:JSON.stringify(
+            vm.idss ,
+        ) ,
+        url : ""+baseURL+"sys/studWx/deleteStudWx",  
+        success : function(json) {  
+          if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.getTableData(); 
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            vm.getTableData(); 
+            }
+        }
+    });
+  })
+    .catch(_ => {
+      
+          });
+} 
+},
+ }
+});
+  </script>  
+</body>  
+</html>  
+</html>

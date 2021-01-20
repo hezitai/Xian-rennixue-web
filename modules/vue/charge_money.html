@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+        <div id="app">
+            <el-button type="primary" @click="searchs">学生充值</el-button>
+            <el-table 
+            :data="tableDataEnd"
+            ref="multipleTable"
+            border
+            style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+            label="id"
+            width="50">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+          label="时间"
+          width="170">
+          <template slot-scope="scope">
+            <span>{{ scope.row.createAt }}</span>
+          </template>
+       </el-table-column>
+           <el-table-column
+           label="学生名称"
+           width="80">
+           <template slot-scope="scope">
+             <span>{{ scope.row.nickName }}</span>
+           </template>
+        </el-table-column>
+           <el-table-column 
+           label="转账金额"
+           width="90">
+           <template slot-scope="scope">
+            <span>{{ scope.row.money }}</span>
+          </template>
+          </el-table-column>
+            <el-table-column 
+             label="货币"
+             width="80">
+             <template slot-scope="scope">
+              <span>{{ scope.row.current }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column 
+            label="状态"
+            width="90">
+            <template slot-scope="scope">
+                <el-tag v-if='scope.row.statused===0'>待审核</el-tag>
+                <el-tag type="success" v-if='scope.row.statused===1'>已通过</el-tag>
+                <el-tag type="warning" v-if='scope.row.statused===2'>已拒绝</el-tag>
+           </template>
+           </el-table-column>
+            <el-table-column 
+            label="凭证"
+            width="120">
+            <template slot-scope="scope">
+             <a v-for="thumbPaths in scope.row.thumbPaths" :href="thumbPaths" target="_Blank"><img :src="thumbPaths" style="width:50px;height:50px;margin-right:10px;border:1px solid #ddd"></a>
+           </template>
+           </el-table-column>
+            </el-table>
+
+            <el-dialog
+            :visible.sync="mm"
+            width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="name">
+                  <el-input v-model="ruleForm.name" style="width:120px"></el-input>
+                  <el-button type="primary" @click="searchname">查询</el-button>
+                  <i v-show="error" style="color:red">{{error}}</i>
+                </el-form-item>
+                <el-form-item label="姓名" prop="studname">
+                  <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount" v-show="person">
+                  <el-input v-model="ruleForm.amount"></el-input>
+                </el-form-item>
+                <el-form-item label="货币类型" prop="current" v-show="person">
+                    <el-form-item>
+                      <el-select v-model="ruleForm.current" style="width: 200px;">
+                          <el-option
+                          v-for="item in currys"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-form-item>
+                  <el-form-item label="上传凭证" v-show="person">
+                      <input type="file" id="img_upload" multiple>
+                  </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+            <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[6]"
+             :page-size="6"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination>
+        </div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script src="js/vue.js"></script>
+  <script src="js/index.js"></script>
+  <script src="../../js/base.js"></script>
+  <script type="text/javascript">  
+  var vm = new Vue({  
+    el:'#app',
+    data() {
+      return {
+        person:false,
+        currys: [{
+          value: 'CNY',
+          label: 'CNY'
+        }, {
+          value: 'USD',
+          label: 'USD'
+        }, {
+          value: 'NZD',
+          label: 'NZD'
+        }, {
+          value: 'AUD',
+          label: 'AUD'
+        }, {
+          value: 'GBP',
+          label: 'GBP'
+        }, {
+          value: '6',
+          label: 'CAD'
+        }],
+      mm:false,  
+      error:'',
+      description:'',
+      tableDataBegin: [],
+      tableDataName: "",
+      tableDataEnd: [],
+      currentPage: 0,
+      pageSize: 0,
+      total:0,
+      filterTableDataEnd:[],
+      idss:[],
+      options:[],
+      selectedOptions: [],
+      selects:'',
+      countryId:'',
+      key:'',
+      courseId:'',
+      val:1,
+      page:"",
+      name:'',
+      superId:'',
+      label:'',
+      dialogStatus: "",
+      ruleForm: {
+        current:'',
+        description:'',
+        },
+        rules: {
+          amount: [
+            { required: true, message: '请填写金额', trigger: 'blue' }
+          ],
+          current: [
+            { required: true, message: '请填写货币类型', trigger: 'blue' }
+          ],
+        }
+      }
+ },
+ multipleSelection: [],
+ mounted() {
+  this.getTableData(); 
+ },
+ methods: {
+  getTableData:function(){  
+    const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading'
+        });
+        var self = this;  
+        $.ajax({  
+          type : "get",  
+          dataType: "json", 
+          data:{
+            "token": token,
+            "page": this.val,
+            "limit": 6 ,
+            "type" : 10,
+            "postWay": 4
+          } ,
+          url : ""+baseURL+"/sys/seller/order/queryStudAccountLog",  
+          success : function(json) {  
+           self.tableDataEnd=json.body.list;  
+           self.total = json.body.totalCount;
+           self.pageSize = json.body.totalCount;
+           self.currentPage = json.body.currPage;
+           loading.close();
+         }
+      });    
+      },
+    searchs(){
+      vm.mm = true;
+    },
+    searchname(){
+      $.ajax({  
+        type : "get",  
+        dataType: "json", 
+        data:{
+          "token": token,
+          "absoluteMobile": vm.$refs.ruleForm.model.name,
+          "page": 1,
+          "limit": 100000 ,
+        } ,
+        url : ""+baseURL+"/sys/seller/order/checkMobile",  
+        success : function(json) {  
+          if(json.status == 200){
+            if(json.body.studUserRVO == null){
+             vm.error = ""
+          }
+          else{
+            vm.$refs.ruleForm.model.studname = json.body.studUserRVO.nickName;
+            vm.error = "该学生已注册";
+            vm.userId = json.body.studUserRVO.userId;
+            vm.person = true;
+            }
+          if(json.body.teacUserRVO != null){
+              vm.error = "该账号已经被老师注册，请更换手机号";
+            }
+          if (json.body.sysUserEntity != null)
+            {
+              vm.error = "该账号已经在CRM注册，请更换手机号";
+            }
+            if(json.body.studUserRVO == null && json.body.sysUserEntity == null && json.body.teacUserRVO == null){
+            vm.mobile_show = true;
+             vm.error = "该账号未被注册"
+          }
+          }
+        if(json.status == 400){
+          vm.error = json.body.msg;
+          vm.ruleForm.nickName = "";
+        }
+
+       } 
+    });
+    },
+ handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  this.pageSize = val;
+  this.handleCurrentChange(this.currentPage);
+ },
+ handleCurrentChange(val) {
+  vm.val = val;
+  this.getTableData(); 
+ },
+ save(formName) {
+      var self = this;
+      this.$refs[formName].validate((valid) => {
+      if (valid) {
+        var file = document.getElementById('img_upload').files;
+            if(file==null)
+                return;    
+            var amount = this.$refs.ruleForm.model.amount;    
+            var current = this.$refs.ruleForm.model.current; 
+            var formData=new FormData();
+            for(i=0;i<file.length;i++){  
+              formData.append("file["+i+"]", file[i]);
+            }
+        formData.append('amount',amount);
+        formData.append('current',current);
+        formData.append('studId',vm.userId);
+        $.ajax({  
+          type : "post",  
+          headers: {"token": token},
+          processData: false,
+          contentType: false,
+          data:formData,
+          mimeType: "multipart/form-data",
+          url : ""+baseURL+"sys/seller/order/evidenceThumbSave",  
+          success : function(json) {  
+            if(json.status == 200){
+              vm.$message({
+              message: json.body.msg,
+              type: 'success'
+            });
+            vm.mm=false;
+            setTimeout(function() { 
+                    window.location.reload();
+                  }, 1000);
+            }
+            if(json.status == 400){
+              vm.$message({
+              message: json.body.msg,
+              type: 'warning'
+            });
+            }
+          }
+      });
+      }
+    });
+  },  
+handleSelectionChange(val) {
+  this.multipleSelection = val;
+  let ids = [];
+  this.multipleSelection.map((item)=> {
+    var id = item.id;
+  ids.push(""+id+"");
+  });
+  this.selectedIDs = ids;
+  console.log('多选',ids);
+  this.idss =  this.selectedIDs;
+  console.log(this.idss);
+},     
+ }
+});
+  </script>  
+  
+</body>  
+</html>  
+</html>
